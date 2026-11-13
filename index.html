@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#1d6b57">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="payoff-symbol.svg">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="payoff-symbol.svg">
 <style>
 :root{--bg:#f2f2f7;--tx:#1c1c1e;--mut:#8e8e93;--card:rgba(255,255,255,.9);--bd:rgba(255,255,255,.75);--fill:rgba(120,120,128,.14);--seg:#fff;--sheet:rgba(248,248,250,.96);--sh:0 8px 32px rgba(0,0,0,.07);--red:#ff3b30;--grn:#34c759;--amb:#ff9500;--ac:#0a84ff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 :root[data-theme=dark],:root[data-theme=amoled]{--bg:#0b0b10;--tx:#f5f5f7;--mut:#98989f;--card:rgba(44,44,52,.92);--bd:rgba(255,255,255,.1);--fill:rgba(120,120,128,.26);--seg:rgba(99,99,102,.85);--sheet:rgba(30,30,36,.97);--sh:0 8px 32px rgba(0,0,0,.35);--red:#ff453a;--grn:#30d158;--amb:#ff9f0a;color-scheme:dark}
@@ -241,7 +241,7 @@ function applyTheme(){var r=document.documentElement,m=document.querySelector('m
 function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
 function mkIc(z,c){var k=document.createElement('canvas');k.width=k.height=z;var x=k.getContext('2d'),u=z/100;x.fillStyle=c;x.fillRect(0,0,z,z);x.fillStyle='#fff';rr(x,28*u,22*u,44*u,56*u,6*u);x.fill();x.fillStyle=c;[36,48,60].forEach(function(y){x.fillRect(36*u,y*u,28*u,4*u)});x.fillStyle='#ff3b30';x.fillRect(36*u,70*u,16*u,3*u);return k.toDataURL('image/png')}
 function applyIcon(){
- var c=P.ic,d=!c||c==='#1d6b57',m=document.querySelector('link[rel=manifest]'),a=d?'icon-192.png':mkIc(192,c);
+ var c=P.ic,d=!c||c==='#1d6b57',m=document.querySelector('link[rel=manifest]'),a=d?'payoff-symbol.svg':mkIc(192,c);
  document.querySelectorAll('link[rel=icon],link[rel=apple-touch-icon]').forEach(function(l){l.href=a});
  if(d){m.href='manifest.json';return}
  var u=location.origin+location.pathname;
@@ -493,7 +493,7 @@ $('#doUpd').onclick=function(){if(window.DividasStartUpdateDownload)window.Divid
 function ntf(){
  if(!P.rem||!window.Notification||Notification.permission!=='granted'||P.ln===today())return;
  var n=due().length;if(!n)return;P.ln=today();sp();
- var o={body:t('remB',{n:n}),icon:'icon-192.png'};
+ var o={body:t('remB',{n:n}),icon:'payoff-symbol.svg'};
  if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(function(r){r.showNotification(t('title'),o)}).catch(function(){});
 }
 applyTheme();applyI();render();lockIt();ntf();chk();
@@ -528,6 +528,5 @@ hidePayoffBootSplash();
 
 if('serviceWorker' in navigator&&!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()))navigator.serviceWorker.register('sw.js').catch(function(){});
 </script>
-<script src="xitique.js"></script>
 </body>
 </html>
