@@ -1,4 +1,4 @@
-const CACHE='payoff-preview-v7';
+const CACHE='payoff-preview-v8';
 const FILES=['./','./index.html','./manifest.json','./payoff-symbol.svg','./payoff-evolution.js','./version.json'];
 self.addEventListener('install',e=>e.waitUntil(
   caches.open(CACHE)
