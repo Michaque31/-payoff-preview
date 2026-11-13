@@ -1,0 +1,1 @@
+Prévia web do Payoff. Este ficheiro mantém o registo da publicação automática pelo GitHub Pages.
