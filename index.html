@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Payoff</title>
+<meta name="theme-color" content="#1d6b57">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="payoff-symbol.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f2f2f7;--tx:#1c1c1e;--mut:#8e8e93;--card:rgba(255,255,255,.9);--bd:rgba(255,255,255,.75);--fill:rgba(120,120,128,.14);--seg:#fff;--sheet:rgba(248,248,250,.96);--sh:0 8px 32px rgba(0,0,0,.07);--red:#ff3b30;--grn:#34c759;--amb:#ff9500;--ac:#0a84ff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root[data-theme=dark],:root[data-theme=amoled]{--bg:#0b0b10;--tx:#f5f5f7;--mut:#98989f;--card:rgba(44,44,52,.92);--bd:rgba(255,255,255,.1);--fill:rgba(120,120,128,.26);--seg:rgba(99,99,102,.85);--sheet:rgba(30,30,36,.97);--sh:0 8px 32px rgba(0,0,0,.35);--red:#ff453a;--grn:#30d158;--amb:#ff9f0a;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme]){--bg:#0b0b10;--tx:#f5f5f7;--mut:#98989f;--card:rgba(44,44,52,.92);--bd:rgba(255,255,255,.1);--fill:rgba(120,120,128,.26);--seg:rgba(99,99,102,.85);--sheet:rgba(30,30,36,.97);--sh:0 8px 32px rgba(0,0,0,.35);--red:#ff453a;--grn:#30d158;--amb:#ff9f0a;color-scheme:dark}}
+:root[data-theme=amoled]{--bg:#000;--card:rgba(24,24,27,.94);--sheet:rgba(14,14,16,.97);--bd:rgba(255,255,255,.07)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,"Helvetica Neue",sans-serif;line-height:1.4;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:-20%;z-index:-1;background:radial-gradient(40% 30% at 20% 10%,color-mix(in srgb,var(--ac) 38%,transparent),transparent 70%),radial-gradient(35% 30% at 92% 32%,color-mix(in srgb,#bf5af2 24%,transparent),transparent 70%),radial-gradient(40% 35% at 30% 95%,color-mix(in srgb,#30d158 20%,transparent),transparent 70%)}
+:root[data-theme=amoled] body::before{opacity:.4}
+.box,.item,.grp,.gear,.sheet,.fab{background:var(--card);border:1px solid var(--bd);box-shadow:var(--sh)}
+.w{max-width:620px;margin:0 auto;padding:12px 16px 110px}
+h1{font-size:24px;font-weight:700;letter-spacing:-.5px;margin:2px 0}.heading{display:flex;flex-direction:column;gap:3px;min-width:0}.brand{display:flex;align-items:center;gap:9px;font-size:21px;font-weight:750;letter-spacing:-.3px;color:var(--tx);margin:0 0 3px}.brand-mark{width:28px;height:28px;object-fit:contain;filter:none}:root[data-theme=dark] .brand-mark,:root[data-theme=amoled] .brand-mark{filter:invert(1)}@media(prefers-color-scheme:dark){:root:not([data-theme]) .brand-mark{filter:invert(1)}}
+h2{margin:0;font-size:20px;font-weight:700}
+.hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.head-actions{display:flex;align-items:center;gap:8px;flex:none}.gear,.calc-trigger{position:relative;width:42px;height:42px;border-radius:50%;font-size:20px;padding:0;color:var(--ac);background:var(--card);border:1px solid var(--bd);box-shadow:var(--sh);-webkit-backdrop-filter:blur(28px) saturate(190%);backdrop-filter:blur(28px) saturate(190%);display:flex;align-items:center;justify-content:center;line-height:0}.gear svg,.calc-trigger svg{display:block;width:22px;height:22px;flex:none;margin:0;padding:0;stroke:currentColor}
+.gear.dot::after{content:'';position:absolute;top:2px;right:2px;width:12px;height:12px;border-radius:50%;background:var(--red);border:2px solid var(--bg)}
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:10px}.privacy-summary .sum .box:nth-child(1),.privacy-summary .sum .box:nth-child(2),.privacy-summary .sum .box:nth-child(4){filter:blur(8px);user-select:none;pointer-events:none}.privacy-hidden .item .nm,.privacy-hidden .item .mut,.privacy-hidden .item .row,.privacy-hidden .item .hist,.privacy-hidden .item .note,.privacy-hidden #rem{filter:blur(7px);user-select:none;pointer-events:none}.privacy-hidden .sum .box{filter:blur(8px);user-select:none;pointer-events:none}.privacy-hidden .item .bar{opacity:.22}
+.box{border-radius:20px;padding:14px}
+.box small{color:var(--mut);display:block;font-size:12px;margin-bottom:2px}
+.box b{font-size:20px;font-weight:700;letter-spacing:-.3px}
+#rem{display:none;margin-top:10px;color:var(--amb);font-weight:600}
+.red{color:var(--red)}.grn{color:var(--grn)}.amb{color:var(--amb)}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--fill);padding:2px;border-radius:12px;margin:18px 0 12px}
+.tabs button{border:none;background:transparent;color:var(--tx);padding:8px 2px;border-radius:10px;font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabs button.on{background:var(--ac);color:#fff;font-weight:600;box-shadow:0 2px 6px color-mix(in srgb,var(--ac) 35%,transparent)}
+.item{border-radius:22px;padding:16px;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.nm{font-weight:600;font-size:17px}
+.tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap;background:color-mix(in srgb,currentColor 14%,transparent)}.priority-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:4px 9px;border-radius:99px;margin-top:6px}.priority-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}.priority-badge.p-low{color:#16803b;background:rgba(52,199,89,.16)}.priority-badge.p-medium{color:#9a6100;background:rgba(255,159,10,.19)}.priority-badge.p-high{color:#c62828;background:rgba(255,59,48,.16)}:root[data-theme=dark] .priority-badge.p-low,:root[data-theme=amoled] .priority-badge.p-low{color:#52d477}:root[data-theme=dark] .priority-badge.p-medium,:root[data-theme=amoled] .priority-badge.p-medium{color:#ffbd4a}:root[data-theme=dark] .priority-badge.p-high,:root[data-theme=amoled] .priority-badge.p-high{color:#ff6961}.item{position:relative;overflow:visible}.item-head{display:block;position:relative;padding-right:42px;min-height:36px}.item-head>.more-wrap{position:absolute;top:0;right:0;z-index:2}.item-head>.tag{display:inline-flex;margin-top:9px}.more-wrap{position:relative;flex:none}.more-btn{width:36px;height:36px;border:1px solid var(--bd);border-radius:12px;background:var(--fill);color:var(--tx);font-size:22px;line-height:1;padding:0 0 5px;display:flex;align-items:center;justify-content:center;transition:background .15s,border-color .15s}.more-btn:active{background:var(--ac);color:#fff;border-color:var(--ac)}.more-menu{position:absolute;right:0;top:38px;z-index:4;min-width:142px;padding:5px;background:var(--sheet);border:1px solid var(--bd);border-radius:13px;box-shadow:var(--sh)}.more-menu button{display:block;width:100%;border:0;border-radius:9px;padding:10px 12px;text-align:left;background:transparent;color:var(--tx);font-size:14px;font-weight:600}.priority-options{display:flex;gap:8px;margin:8px 0 14px}.priority-choice{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;min-height:44px;border:1px solid var(--bd);border-radius:13px;padding:10px 5px;background:var(--fill);font-size:13px;font-weight:700;color:var(--mut);transition:background .16s,border-color .16s,color .16s,transform .16s}.priority-choice::before{content:'';width:9px;height:9px;flex:none;border-radius:50%;background:var(--priority-color,currentColor);opacity:.9}.priority-choice.low{--priority-color:#30a85a}.priority-choice.medium{--priority-color:#d99400}.priority-choice.high{--priority-color:#e04444}.priority-choice.low.selected{color:#16803b;background:rgba(52,199,89,.16);border-color:#34c759}.priority-choice.medium.selected{color:#9a6100;background:rgba(255,159,10,.19);border-color:#ff9500}.priority-choice.high.selected{color:#c62828;background:rgba(255,59,48,.16);border-color:#ff3b30}:root[data-theme=dark] .priority-choice.low.selected,:root[data-theme=amoled] .priority-choice.low.selected{color:#52d477}:root[data-theme=dark] .priority-choice.medium.selected,:root[data-theme=amoled] .priority-choice.medium.selected{color:#ffbd4a}:root[data-theme=dark] .priority-choice.high.selected,:root[data-theme=amoled] .priority-choice.high.selected{color:#ff6961}
+.mut{color:var(--mut);font-size:13px}
+.bar{height:6px;background:var(--fill);border-radius:9px;margin:12px 0 8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ac);border-radius:9px}
+.acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.btn,.acts button{border:none;background:var(--fill);color:var(--ac);padding:9px 15px;border-radius:99px;font-size:14px;font-weight:600}
+.pri{background:var(--ac)!important;color:#fff!important}
+.dng{color:var(--red)!important}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));padding:15px 28px;border-radius:99px;font-size:16px;font-weight:600;color:#fff;background:color-mix(in srgb,var(--ac) 88%,transparent);border-color:rgba(255,255,255,.25);white-space:nowrap}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.3);display:none;align-items:flex-end;justify-content:center;z-index:5}
+.ov.on{display:flex}
+.sheet{background:var(--sheet);width:100%;max-width:620px;border-radius:28px 28px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow:auto;-webkit-backdrop-filter:blur(40px) saturate(180%);backdrop-filter:blur(40px) saturate(180%)}
+.grab{width:38px;height:5px;border-radius:9px;background:var(--fill);margin:0 auto 14px}
+#ovSet .grab{width:100%;height:42px;margin:-10px 0 8px;background:transparent;position:relative;touch-action:none;cursor:grab}
+#ovSet .grab::after{content:'';position:absolute;top:18px;left:50%;transform:translateX(-50%);width:38px;height:5px;border-radius:9px;background:var(--fill)}
+/* Definições em ecrã completo e com renderização mais leve no Android */
+#ovSet{align-items:stretch}#ovSet .sheet{height:100%;max-height:100%;max-width:none;border-radius:0;padding-top:calc(10px + env(safe-area-inset-top,0px));-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;overscroll-behavior-y:contain;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;contain:layout style;transform:translateZ(0);will-change:scroll-position}#ovSet .grp{box-shadow:none;contain:layout style}
+.grp{border-radius:18px;padding:2px 14px 14px;margin-top:14px}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 6px}
+label.chk{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--tx);font-size:16px;margin:12px 0 4px}
+input,select{width:100%;padding:12px 14px;border:none;border-radius:12px;background:var(--fill);color:var(--tx);font-size:16px;-webkit-appearance:none;appearance:none;font-family:inherit}
+input.sw2{width:51px;height:31px;border-radius:99px;position:relative;flex:none;transition:.2s;padding:0}
+input.sw2::after{content:'';position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.3);transition:.2s}
+input.sw2:checked{background:var(--grn)}
+input.sw2:checked::after{transform:translateX(20px)}
+.seg{display:flex;gap:2px;background:var(--fill);padding:2px;border-radius:12px;margin-top:10px}
+.seg button{flex:1;background:transparent;color:var(--tx);border-radius:10px;padding:9px}
+.seg button.pri{background:var(--ac)!important;color:#fff!important;box-shadow:0 2px 6px color-mix(in srgb,var(--ac) 35%,transparent)}
+.seg button:not(.pri){color:var(--ac)}
+.hist{margin-top:10px;font-size:13px;color:var(--mut);border-top:1px solid var(--fill);padding-top:8px}.payment-history-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0}.payment-history-row .btn{padding:5px 10px;font-size:12px;flex:none}.message-actions{position:relative;display:flex;align-items:center;gap:7px}.message-toggle{width:44px;height:40px;display:flex;align-items:center;justify-content:center;border:1px solid var(--bd);border-radius:14px;background:var(--fill);color:var(--ac);padding:8px}.message-toggle svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.message-options{display:flex;gap:7px;align-items:center;animation:messageExpand .18s ease both}.message-options button{border:0;border-radius:99px;padding:9px 13px;background:var(--fill);color:var(--ac);font-size:13px;font-weight:650}.message-options .contact-action{background:rgba(37,211,102,.13);color:#159447}@keyframes messageExpand{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}.contact-line{display:flex;gap:8px;align-items:center}.contact-line input{min-width:0;flex:1}.contact-line button{white-space:nowrap;flex:none}.acts .contact-action{background:rgba(37,211,102,.13);color:#159447}
+.empty{text-align:center;color:var(--mut);padding:48px 10px}
+#ovTrash,#ovGuide{align-items:stretch}#ovTrash .sheet,#ovGuide .sheet{height:100%;max-height:100%;max-width:none;border-radius:0;padding-top:calc(14px + env(safe-area-inset-top,0px));padding-bottom:calc(22px + env(safe-area-inset-bottom,0px));-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:none;overflow-y:auto;-webkit-overflow-scrolling:touch}#ovTrash .trash-settings{margin:14px 0;padding:14px;border:1px solid var(--bd);border-radius:16px;background:var(--fill)}#undoBar{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;display:none;align-items:center;gap:12px;max-width:calc(100vw - 28px);padding:10px 12px 10px 16px;border:1px solid var(--bd);border-radius:16px;background:var(--sheet);box-shadow:0 8px 28px rgba(0,0,0,.22);font-size:13px}#undoBar.on{display:flex}#undoBar button{border:0;border-radius:10px;background:var(--ac);color:#fff;padding:8px 13px;font-weight:700;white-space:nowrap}.guide-step{display:grid;grid-template-columns:42px 1fr;column-gap:12px;align-items:start;padding:15px 0;border-bottom:1px solid var(--fill)}.guide-illustration{grid-row:span 2;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:color-mix(in srgb,var(--ac) 13%,var(--fill));font-size:21px}.guide-step b{align-self:end}.guide-step:last-child{border-bottom:0}.guide-step b{display:block;margin-bottom:4px;color:var(--tx)}.guide-step p{margin:0;color:var(--mut);font-size:13px;line-height:1.55}
+.release-notes{display:none;margin-top:10px;padding:12px;border:1px solid var(--bd);border-radius:14px;background:var(--fill);color:var(--tx);font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;max-height:220px;overflow:auto}.release-notes.on{display:block}#calcPanel{position:fixed;right:12px;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:9;width:min(292px,calc(100vw - 28px));padding:11px;border-radius:20px;background:var(--sheet);border:1px solid var(--bd);box-shadow:0 14px 38px rgba(0,0,0,.2);-webkit-backdrop-filter:blur(32px) saturate(180%);backdrop-filter:blur(32px) saturate(180%);display:none;transform-origin:top right}#calcPanel.on{display:block;animation:calcPanelIn .2s cubic-bezier(.2,.8,.2,1) both}#calcPanel.closing{display:block;animation:calcPanelOut .16s ease both;pointer-events:none}@keyframes calcPanelIn{from{opacity:0;transform:translateY(9px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}@keyframes calcPanelOut{from{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(7px) scale(.95)}}.calc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;min-height:30px;touch-action:none;cursor:grab;user-select:none}.calc-top b{font-size:14px}.calc-display{width:100%;min-height:46px;padding:8px 10px;border-radius:12px;background:var(--fill);text-align:right;font-size:22px;font-weight:650;letter-spacing:-.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}.calc-result{min-height:19px;text-align:right;color:var(--mut);font-size:12px;padding:3px 4px 6px}.calc-keys{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}.calc-keys button{min-height:39px;border:1px solid var(--bd);border-radius:11px;background:var(--fill);color:var(--tx);font-size:16px;font-weight:600}.calc-keys button.op{color:var(--ac)}.calc-keys button.equal{background:var(--ac);color:#fff;border-color:var(--ac)}.calc-actions{display:flex;gap:7px;margin-top:8px}.calc-actions button{flex:1;min-width:0;padding:8px 7px;border:1px solid var(--bd);border-radius:11px;background:var(--fill);color:var(--ac);font-size:12px;font-weight:650}.calc-actions button:disabled{opacity:.4}.calc-history{display:none;max-height:125px;overflow:auto;margin-top:8px;border-top:1px solid var(--bd);padding-top:6px}.calc-history.on{display:block}.calc-history button{display:flex;width:100%;justify-content:space-between;gap:8px;padding:7px 5px;border:0;border-radius:8px;background:transparent;color:var(--tx);font-size:12px;text-align:left}.calc-history button:active{background:var(--fill)}.calc-history small{color:var(--mut)}@media(prefers-reduced-motion:reduce){#calcPanel.on,#calcPanel.closing{animation:none!important}}
+.swr{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:4px 0 2px}
+.sw{width:32px;height:32px;border-radius:50%;border:2px solid transparent;padding:0;box-shadow:inset 0 0 0 2px var(--bg)}
+.sw.on{border-color:var(--tx)}
+.colorPick{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;position:relative;flex:none;margin:0;padding:0;border-radius:50%;overflow:hidden;cursor:pointer;background:conic-gradient(#ff3b30 0deg,#ff9500 60deg,#ffcc00 110deg,#34c759 165deg,#00c7be 215deg,#0a84ff 270deg,#bf5af2 320deg,#ff3b30 360deg);box-shadow:inset 0 0 0 2px var(--bg)}.colorPick span{width:15px;height:15px;border-radius:50%;background:conic-gradient(#ff3b30,#ff9500,#ffcc00,#34c759,#00c7be,#0a84ff,#bf5af2,#ff3b30);border:2px solid rgba(255,255,255,.9);box-shadow:0 1px 3px rgba(0,0,0,.3);pointer-events:none}.colorPick input.cp{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;padding:0;border:0;margin:0}
+.icrow{display:flex;gap:12px;align-items:center;margin-top:10px}
+.icp{width:58px;height:58px;border-radius:14px;flex:none;position:relative}
+.icp::after{content:'';position:absolute;left:19px;top:14px;width:20px;height:30px;border-radius:3px;background:#fff}
+#lock{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:20;padding:24px}
+#lock input{max-width:220px;text-align:center;font-size:24px;letter-spacing:8px}#lock input{-webkit-text-security:disc}
+#chk.loading::after{content:'';display:inline-block;width:13px;height:13px;margin-left:9px;vertical-align:-2px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:chkspin .7s linear infinite}@keyframes chkspin{to{transform:rotate(360deg)}}
+
+.about-title{font-size:14px;font-weight:700;margin:12px 0 5px;color:var(--tx)}
+.about-copy{font-size:13px;line-height:1.55;color:var(--mut);margin:0}
+.about-meta{display:grid;gap:9px;margin-top:12px}
+.about-meta b{display:block;color:var(--tx);font-size:13px}
+.about-meta span{font-size:13px;color:var(--mut)}
+.feedback-actions{display:flex;gap:8px;width:100%;margin-top:12px}.feedback-actions .btn{display:flex;flex:1;min-width:0;align-items:center;justify-content:center;text-align:center;text-decoration:none;margin:0;padding:12px 8px;font-size:13px;line-height:1.25}
+
+/* Abertura premium do Payoff */
+#payoffBootSplash{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#0b0b10;opacity:1;visibility:visible;pointer-events:auto;transition:opacity .26s ease,visibility .26s ease}
+#payoffBootSplash.done{opacity:0;visibility:hidden;pointer-events:none}
+#payoffBootSplash .boot-emblem{position:relative;width:128px;height:128px;display:grid;place-items:center}
+#payoffBootSplash .boot-orbit{position:absolute;inset:0;border:2px solid rgba(255,255,255,.13);border-top-color:rgba(255,255,255,.92);border-right-color:rgba(255,255,255,.48);border-radius:50%;animation:payoffBootSpin 1.05s linear infinite}
+#payoffBootSplash .boot-mark{position:relative;width:82px;height:82px;object-fit:contain;filter:invert(1);animation:payoffBootPulse 1.45s ease-in-out infinite}
+@keyframes payoffBootSpin{to{transform:rotate(360deg)}}
+@keyframes payoffBootPulse{0%,100%{transform:scale(.96);opacity:.82}50%{transform:scale(1.04);opacity:1}}
+@media(prefers-reduced-motion:reduce){#payoffBootSplash .boot-orbit,#payoffBootSplash .boot-mark{animation:none!important}}
+
+</style>
+</head>
+<body>
+
+<div id="payoffBootSplash" role="status" aria-label="Payoff a carregar">
+  <div class="boot-emblem">
+    <span class="boot-orbit" aria-hidden="true"></span>
+    <img class="boot-mark" src="payoff-symbol.svg" alt="">
+  </div>
+</div>
+<script>
+window.__payoffBootStartedAt=Date.now();
+window.setTimeout(function(){
+  var splash=document.getElementById('payoffBootSplash');
+  if(splash&&!splash.classList.contains('done')){
+    splash.classList.add('done');
+    window.setTimeout(function(){if(splash.parentNode)splash.parentNode.removeChild(splash)},320);
+  }
+},3500);
+</script>
+
+<div class="w">
+<div class="hd"><div class="heading"><div class="brand"><img class="brand-mark" src="payoff-symbol.svg" alt=""><span>Payoff</span></div><h1 data-i="title"></h1></div><div class="head-actions"><button class="gear calc-trigger" id="calcToggle" type="button" aria-label="Calculadora" title="Calculadora"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2M8 15h2m4 0h2M8 18h2m4 0h2"/></svg></button><button class="gear" id="privacyToggle" type="button" aria-label="Mostrar ou ocultar contas" title="Mostrar ou ocultar contas"><svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/></svg></button><button class="gear" id="gear" aria-label="Settings" type="button"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.75 14 4.1l2.35-.15.95 2.15 2.1 1.05-.15 2.35L20.6 12l-1.35 2.05.15 2.35-2.1 1.05-.95 2.15-2.35-.15L12 20.8l-2-1.35-2.35.15-.95-2.15-2.1-1.05.15-2.35L3.4 12l1.35-2.05-.15-2.35 2.1-1.05.95-2.15 2.35.15L12 2.75Z"/><circle cx="12" cy="12" r="3.1"/></svg></button></div></div>
+<div class="sum">
+<div class="box"><small data-i="owe"></small><b class="red" id="sDevo"></b></div>
+<div class="box"><small data-i="owed"></small><b class="grn" id="sDevem"></b></div>
+<div class="box"><small data-i="late"></small><b class="amb" id="sAtr">0</b></div>
+<div class="box"><small data-i="net"></small><b id="sNet"></b></div>
+</div>
+<div class="box" id="rem"></div>
+<div class="tabs" id="tabs">
+<button data-f="todas" class="on" data-i="open"></button>
+<button data-f="devo" data-i="owe"></button>
+<button data-f="devem" data-i="owed"></button>
+<button data-f="pagas" data-i="paidT"></button>
+</div>
+<div id="list"></div>
+</div>
+<button class="fab" id="add" data-i="add"></button>
+
+<div id="calcPanel" aria-label="Calculadora" aria-hidden="true"><div class="calc-top" id="calcDrag"><b data-i="calcTitle"></b><button class="btn" id="calcClose" type="button" aria-label="Fechar">×</button></div><div class="calc-display" id="calcDisplay">0</div><div class="calc-result" id="calcResult"> </div><div class="calc-keys" id="calcKeys"><button type="button" class="op" data-cal="clear">C</button><button type="button" class="op" data-cal="back">⌫</button><button type="button" class="op" data-cal="/">÷</button><button type="button" class="op" data-cal="*">×</button><button type="button" data-cal="7">7</button><button type="button" data-cal="8">8</button><button type="button" data-cal="9">9</button><button type="button" class="op" data-cal="-">−</button><button type="button" data-cal="4">4</button><button type="button" data-cal="5">5</button><button type="button" data-cal="6">6</button><button type="button" class="op" data-cal="+">+</button><button type="button" data-cal="1">1</button><button type="button" data-cal="2">2</button><button type="button" data-cal="3">3</button><button type="button" class="equal" data-cal="=">=</button><button type="button" data-cal="0" style="grid-column:span 2">0</button><button type="button" data-cal=".">.</button><button type="button" class="op" data-cal="(">( )</button></div><div class="calc-actions"><button type="button" id="calcCopy" data-i="calcCopy"></button><button type="button" id="calcHistoryToggle">Histórico</button></div><div class="calc-history" id="calcHistory"></div></div>
+
+<div class="ov" id="ovAdd"><div class="sheet"><div class="grab"></div>
+<h2 data-i="nd"></h2>
+<div class="seg" id="kind"><button class="btn pri" data-k="devo" data-i="owe"></button><button class="btn" data-k="devem" data-i="owed"></button></div>
+<label data-i="who"></label><input id="fP" data-p="name"><label data-i="phone"></label><div class="contact-line"><input id="fPhone" type="tel" inputmode="tel" placeholder="+258..."><button type="button" class="btn" id="pickContact" data-i="pickContact"></button></div>
+<label data-i="amt"></label><input id="fV" type="number" inputmode="decimal" min="0">
+<label data-i="dte"></label><input id="fD" type="date">
+<label data-i="due"></label><input id="fL" type="date">
+<label data-i="note"></label><input id="fN">
+<label data-i="priority"></label><div class="priority-options" id="priorityOptions"><button type="button" class="priority-choice low" data-priority-choice="low" data-i="low"></button><button type="button" class="priority-choice medium" data-priority-choice="medium" data-i="medium"></button><button type="button" class="priority-choice high" data-priority-choice="high" data-i="high"></button></div><select id="fPriority" style="display:none" aria-hidden="true"><option value="low"></option><option value="medium"></option><option value="high"></option></select>
+<div class="acts"><button class="btn pri" id="saveAdd" data-i="save"></button><button class="btn" data-close data-i="cancel"></button></div>
+</div></div>
+
+<div class="ov" id="ovPay"><div class="sheet"><div class="grab"></div>
+<h2 data-i="pay"></h2>
+<div class="mut" id="payInfo"></div>
+<label data-i="payv"></label><input id="pV" type="number" inputmode="decimal" min="0">
+<label data-i="payd"></label><input id="pD" type="date">
+<div class="acts"><button class="btn pri" id="savePay" data-i="reg"></button><button class="btn" data-close data-i="cancel"></button></div>
+</div></div>
+
+<div class="ov" id="ovAddDebt"><div class="sheet"><div class="grab"></div>
+<h2 data-i="addDebtTitle"></h2>
+<div class="mut" id="addDebtInfo"></div>
+<label data-i="amt"></label><input id="aV" type="number" inputmode="decimal" min="0">
+<label data-i="payd"></label><input id="aD" type="date">
+<label data-i="note"></label><input id="aN">
+<div class="acts"><button class="btn pri" id="saveAddDebt" data-i="addDebtSave"></button><button class="btn" data-close data-i="cancel"></button></div>
+</div></div>
+
+<div class="ov" id="ovSet"><div class="sheet"><div class="grab"></div>
+<div class="row"><h2 data-i="set"></h2><button class="btn" data-close data-i="close"></button></div>
+<div class="grp"><label><b id="uT" style="color:var(--tx);font-size:15px"></b></label><div class="mut" id="vv"></div>
+<div class="acts"><button class="btn pri" id="doUpd" style="display:none" data-i="updN"></button><button class="btn" id="chk" data-i="chk"></button></div><button class="btn" id="toggleReleaseNotes" type="button" style="display:none;width:100%;margin-top:10px" aria-expanded="false" data-i="showNotes"></button><div class="release-notes" id="releaseNotes" aria-live="polite"></div></div>
+<div class="grp">
+<label data-i="lang"></label>
+<select id="sL"><option value="pt">Português</option><option value="en">English</option></select>
+<label data-i="cur"></label><select id="sC"></select>
+<label data-i="theme"></label>
+<select id="sT"><option value="auto" data-i="auto"></option><option value="light" data-i="lt"></option><option value="dark" data-i="dk"></option><option value="amoled" data-i="amo"></option></select>
+</div>
+<div class="grp">
+<label data-i="acc"></label><div class="swr" id="swA"></div>
+
+</div>
+<div class="grp"><label class="chk"><span data-i="remOn"></span><input type="checkbox" class="sw2" id="sR"></label>
+<label data-i="dbf"></label><select id="sD"></select></div>
+<div class="grp"><label data-i="pin"></label><button class="btn" id="pinB"></button></div><div class="grp"><label data-i="privacyTitle"></label><label class="chk"><span data-i="privacyStart"></span><input type="checkbox" class="sw2" id="sPrivacy"></label><label data-i="privacyMode"></label><select id="sPrivacyMode"><option value="totals" data-i="privacyTotals"></option><option value="all" data-i="privacyEverything"></option></select><p class="mut" data-i="privacyHint"></p></div>
+<div class="grp"><label data-i="trashTitle"></label><div class="acts"><button class="btn" id="trashToggle" type="button" data-i="openTrash"></button></div></div>
+<div class="grp"><label data-i="bk"></label>
+<div class="acts" style="margin-top:0"><button class="btn" id="exp" data-i="exp"></button><button class="btn" id="expPdf" data-i="pdf"></button><button class="btn" id="imp" data-i="imp"></button></div>
+<input type="file" id="fi" accept=".json,application/json" style="display:none">
+<div class="acts"><button class="btn dng" id="wipe" data-i="wipe"></button></div></div><div class="grp" id="aboutApp">
+<label data-i="about"></label>
+<p class="about-copy" data-i="aboutDesc"></p>
+<div class="about-meta">
+<div><b data-i="creator"></b><span>Michaque Almirante</span></div>
+<div><b data-i="company"></b><span>Baluarte Softwares</span></div>
+<div><b data-i="license"></b><span data-i="licenseText"></span></div>
+</div>
+<div class="feedback-actions"><a class="btn" id="bugReport" href="mailto:michaquealmirante3110@gmail.com?subject=Relato%20de%20problema%20%E2%80%94%20app%20D%C3%ADvidas&amp;body=Ol%C3%A1%2C%20encontrei%20um%20problema%20na%20aplica%C3%A7%C3%A3o%20D%C3%ADvidas.%0A%0ADescri%C3%A7%C3%A3o%20do%20problema%3A%0A%0AModelo%20do%20telem%C3%B3vel%20e%20vers%C3%A3o%20do%20app%20(se%20poss%C3%ADvel)%3A"><span data-i="report"></span></a><a class="btn" id="suggestionReport" href="mailto:michaquealmirante3110@gmail.com?subject=Sugest%C3%A3o%20de%20melhoria%20%E2%80%94%20app%20D%C3%ADvidas&amp;body=Ol%C3%A1%2C%20gostaria%20de%20sugerir%20uma%20melhoria%20para%20a%20aplica%C3%A7%C3%A3o%20D%C3%ADvidas.%0A%0AMinha%20sugest%C3%A3o%3A%0A"><span data-i="suggest"></span></a></div>
+</div><div class="grp" id="guideSettingsEntry"><label data-i="guideTitle"></label><div class="acts"><button class="btn" id="openGuide" data-i="guideOpen"></button></div></div></div>
+</div></div>
+
+<div class="ov" id="ovTrash"><div class="sheet"><div class="row"><h2 data-i="trashTitle"></h2><button class="btn" data-close data-i="close"></button></div><div class="trash-settings"><label data-i="trashRetention"></label><select id="trashDays"><option value="7">7 dias</option><option value="15">15 dias</option><option value="30">30 dias</option></select><p class="mut" data-i="trashRetentionHint"></p></div><div id="trashList"></div></div></div>
+<div class="ov" id="ovGuide"><div class="sheet"><div class="row"><h2 data-i="guideTitle"></h2><button class="btn" data-close data-i="close"></button></div><div class="guide-step"><div class="guide-illustration">📝</div><b data-i="guide1Title"></b><p data-i="guide1Text"></p></div><div class="guide-step"><div class="guide-illustration">💳</div><b data-i="guide2Title"></b><p data-i="guide2Text"></p></div><div class="guide-step"><div class="guide-illustration">✏️</div><b data-i="guide3Title"></b><p data-i="guide3Text"></p></div><div class="guide-step"><div class="guide-illustration">💬</div><b data-i="guide4Title"></b><p data-i="guide4Text"></p></div><div class="guide-step"><div class="guide-illustration">🗑️</div><b data-i="guide5Title"></b><p data-i="guide5Text"></p></div><div class="guide-step"><div class="guide-illustration">☁️</div><b data-i="guide6Title"></b><p data-i="guide6Text"></p></div><div class="guide-step"><div class="guide-illustration">👁️</div><b data-i="guide7Title"></b><p data-i="guide7Text"></p></div></div></div>
+<div id="undoBar" role="status"><span id="undoText"></span><button type="button" id="undoAction" data-i="undo"></button></div>
+<div id="lock"><h2 data-i="unlock"></h2><input id="lp" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-bwignore="true" data-1p-ignore="true" data-lpignore="true" aria-label="PIN de desbloqueio"><div class="red" id="le"></div></div>
+
+<script>
+var T={
+pt:{title:'Registo de Dívidas',owe:'Eu devo',owed:'Devem-me',late:'Em atraso',net:'Saldo líquido',open:'Em aberto',paidT:'Liquidadas',empty:'Nenhuma dívida aqui.',add:'+ Novo registo',nd:'Novo registo',who:'Pessoa',name:'Nome',amt:'Valor',dte:'Data da dívida',due:'Data limite (opcional)',note:'Nota (opcional)',save:'Guardar',cancel:'Cancelar',pay:'Registar pagamento',payv:'Valor pago',payd:'Data',reg:'Registar',addDebtBtn:'Adicionar dívida',addDebtTitle:'Adicionar dívida',addDebtSave:'Adicionar',addDebtInfo:'Este valor será acrescentado ao total deste registo.',addHistory:'Dívida adicionada',pend:'Pendente',part:'Parcial',liq:'Liquidada',he:'Deve-me',iow:'Eu devo',since:'desde',lim:'limite',paidOf:'Pago {a} de {b}',miss:'Falta {a}',hist:'Histórico',edit:'Editar',priority:'Prioridade',low:'Baixa',medium:'Média',high:'Alta',more:'Mais opções',e4:'O valor não pode ser inferior ao total já pago ({a}).',del:'Apagar',nopay:'Sem pagamentos.',cal:'Lembrete',cdel:'Apagar esta dívida e o seu histórico?',e1:'Indique o nome e um valor válido.',e2:'Indique um valor válido.',e3:'Valor superior ao que falta ({a}).',set:'Definições',privacyTitle:'Privacidade das contas',privacyStart:'Abrir a aplicação com as contas ocultas',privacyMode:'O que pretende ocultar',privacyTotals:'Ocultar apenas Eu devo, Devem-me e saldo líquido',privacyEverything:'Ocultar todos os dados dos registos',privacyHint:'Escolha se pretende ocultar apenas os três totais do painel ou todos os dados dos cartões. O botão do olho no topo permite mostrar ou ocultar temporariamente.',showAccounts:'Mostrar contas',hideAccounts:'Ocultar contas',acc:'Cor de destaque',ico:'Cor do ícone no ecrã inicial',icoN:'Aplica-se ao adicionar o app ao ecrã inicial a partir do navegador. Um ícone já instalado não muda: remova-o e adicione de novo.',amo:'Escuro AMOLED (preto puro)',close:'Fechar',lang:'Idioma',cur:'Moeda (só muda a apresentação, não converte valores)',theme:'Tema',auto:'Automático',lt:'Claro',dk:'Escuro',remOn:'Avisar de dívidas a vencer',dbf:'Avisar com antecedência de',d0:'No próprio dia',dn:'{n} dia(s)',remB:'{n} dívida(s) a vencer ou em atraso',pin:'Bloqueio por PIN',setPin:'Definir PIN',rmPin:'Remover PIN',npin:'Novo PIN (4 a 6 números):',pinBad:'PIN inválido.',unlock:'Introduza o PIN',entrar:'Entrar',wrong:'PIN errado.',bk:'Cópia de segurança',exp:'Exportar',pdf:'Exportar PDF',imp:'Importar',impd:'{n} dívida(s) importada(s).',inv:'Ficheiro inválido.',wipe:'Apagar todos os dados',about:'Acerca do app',aboutDesc:'O Payoff é uma aplicação criada para ajudar a organizar e acompanhar dívidas pessoais de forma simples e clara. Permite registar valores que deve ou que lhe devem, adicionar pagamentos parciais, consultar o saldo em aberto e acompanhar datas limite e histórico. O objetivo é facilitar o controlo financeiro do dia a dia, reduzir esquecimentos e ajudar a decidir quais compromissos merecem mais atenção.',creator:'Criador',company:'Empresa desenvolvedora',license:'Licença',licenseText:'Proprietária — todos os direitos reservados. A cópia, modificação ou distribuição da aplicação depende de autorização do titular dos direitos.',report:'Reportar um problema',suggest:'Sugerir melhoria',reportSubject:'Relato de problema — app Dívidas',reportBody:'Olá, encontrei um problema na aplicação Dívidas.\\n\\nDescrição do problema:\\n\\nModelo do telemóvel e versão do app (se possível):',cwipe:'Apagar TODAS as dívidas? Não pode ser desfeito.',ver:'Versão',ok:'Tem a versão mais recente.',upd:'Atualização disponível',updN:'Atualizar agora',chk:'Verificar atualização',off:'Sem ligação à internet.',showNotes:'Ver novidades desta atualização',hideNotes:'Ocultar novidades',calcTitle:'Calculadora',calcCopy:'Copiar resultado',phone:'Telefone (opcional)',pickContact:'Escolher contacto',trashTitle:'Lixeira',trashRetention:'Eliminar automaticamente após',trashRetentionHint:'Os registos permanecem aqui durante o período escolhido e depois são eliminados automaticamente.',openTrash:'Ver lixeira',trashEmpty:'A lixeira está vazia.',restore:'Restaurar',deleteForever:'Apagar definitivamente',deleteForeverConfirm:'Apagar este registo definitivamente?',releaseSummary:'• Privacidade configurável: ocultar apenas “Eu devo”, “Devem-me” e saldo líquido, ou ocultar todos os dados dos registos.\n• Fecho mais fiável dos menus dos três pontos ao tocar fora dos cartões.\n• Botão WhatsApp/SMS corrigido: expande com um toque, fecha corretamente e mantém apenas um menu aberto de cada vez.\n• Novidades da atualização apresentadas em lista organizada, mesmo quando a publicação só fornece a ligação “Full Changelog”.\n• Lixeira em ecrã completo, com gestão do prazo de eliminação no próprio ecrã.\n• Escolha de contactos diretamente na agenda do Android, com pedido de permissão.\n• Botão único para expandir as opções WhatsApp e SMS e preparar lembretes.\n• Opção de desfazer alterações a registos e pagamentos.\n• Guia de utilização mais completo nas Definições.\n• Melhorias gerais de navegação e estabilidade.',guideTitle:'Guia de utilização',guideOpen:'Abrir guia de utilização',guide1Title:'1. Criar um registo',guide1Text:'Toque em “+ Novo registo” e escolha primeiro se é um valor que deve ou que lhe devem. Preencha o nome, telefone (se aplicável), valor total, data e data limite. A nota ajuda a identificar o motivo, por exemplo “Empréstimo para investimento”. Escolha também a prioridade para destacar os compromissos mais importantes.',guide2Title:'2. Registar pagamentos',guide2Text:'No cartão da pessoa, toque em “Registar pagamento”. Indique o montante recebido ou pago e confirme a data. Pode registar vários pagamentos parciais: a barra de progresso, o total já pago e o valor em falta são recalculados automaticamente. Abra “Histórico” para consultar ou corrigir pagamentos anteriores.',guide3Title:'3. Corrigir informações',guide3Text:'Use o botão de três pontos no cartão para editar os dados ou apagar o registo. Para corrigir um pagamento, abra “Histórico” e toque em “Editar” junto ao movimento. Depois de guardar uma edição, aparece temporariamente a opção “Desfazer”, caso tenha alterado algo por engano.',guide4Title:'4. Lembretes',guide4Text:'Em qualquer cartão, toque no botão com o ícone de dois balões. O botão abre duas opções: WhatsApp e SMS. Ao escolher um contacto, o Android pode pedir autorização para aceder aos contactos; permita o acesso para abrir a agenda e selecionar o número. O nome e o telefone são preenchidos automaticamente no formulário e ficam guardados nesse registo. Se não quiser conceder a permissão, pode escrever o número manualmente. Ao tocar em WhatsApp ou SMS, o Payoff abre a aplicação correspondente com o número e uma mensagem preparada com o nome e o saldo em falta. Confirme o texto e toque em enviar dentro da aplicação. O Payoff não envia mensagens sem a sua confirmação.',guide5Title:'5. Lixeira',guide5Text:'Abra as Definições e entre em “Lixeira”. Os registos apagados ficam guardados durante o prazo escolhido (7, 15 ou 30 dias). Pode restaurar um registo para a lista principal ou apagá-lo definitivamente. A eliminação automática é gerida dentro da própria Lixeira.',guide6Title:'6. Cópias de segurança e atualizações',guide6Text:'Em “Cópia de segurança”, exporte regularmente um ficheiro e guarde-o num local seguro. Para recuperar dados, use “Importar”. Antes de instalar uma atualização, consulte as notas apresentadas nas Definições. Evite apagar os dados da aplicação sem ter uma cópia atualizada.',guide7Title:'7. Ocultar as contas em público',guide7Text:'Abra as Definições e procure “Privacidade das contas”. Ative “Abrir a aplicação com as contas ocultas” para que, sempre que iniciar o Payoff, os nomes das pessoas, os valores, os pagamentos e o saldo líquido apareçam desfocados. Quando estiver num local privado, toque no botão do olho no topo do ecrã para mostrar temporariamente os dados. Toque novamente para os ocultar. Esta opção protege a visualização no ecrã, mas não substitui o bloqueio por PIN nem encripta os dados guardados no telemóvel.',undo:'Desfazer',undoDone:'Alteração revertida.',undoEdit:'Edição guardada. Pode desfazer.',phoneNeeded:'Introduza o número de telefone para enviar o lembrete:'},
+en:{title:'Debt Register',owe:'I owe',owed:'Owed to me',late:'Overdue',net:'Net balance',open:'Open',paidT:'Settled',empty:'No debts here.',add:'+ New record',nd:'New record',who:'Person',name:'Name',amt:'Amount',dte:'Debt date',due:'Due date (optional)',note:'Note (optional)',save:'Save',cancel:'Cancel',pay:'Record payment',payv:'Amount paid',payd:'Date',reg:'Record',addDebtBtn:'Add debt',addDebtTitle:'Add debt',addDebtSave:'Add',addDebtInfo:'This amount will be added to this record total.',addHistory:'Debt added',pend:'Pending',part:'Partial',liq:'Settled',he:'Owes me',iow:'I owe',since:'since',lim:'due',paidOf:'Paid {a} of {b}',miss:'{a} left',hist:'History',edit:'Edit',priority:'Priority',low:'Low',medium:'Medium',high:'High',more:'More options',e4:'The amount cannot be lower than the amount already paid ({a}).',del:'Delete',nopay:'No payments.',cal:'Reminder',cdel:'Delete this debt and its history?',e1:'Enter a name and a valid amount.',e2:'Enter a valid amount.',e3:'Amount exceeds what is left ({a}).',set:'Settings',privacyTitle:'Account privacy',privacyStart:'Open the app with accounts hidden',privacyMode:'What would you like to hide?',privacyTotals:'Hide only I owe, Owed to me and net balance',privacyEverything:'Hide all record details',privacyHint:'Choose to hide only the three dashboard totals or all information on record cards. Use the eye button at the top to temporarily reveal or hide them.',showAccounts:'Show accounts',hideAccounts:'Hide accounts',acc:'Accent color',ico:'Home screen icon color',icoN:'Applies when adding the app to the home screen from the browser. An already installed icon will not change: remove it and add it again.',amo:'Dark AMOLED (pure black)',close:'Close',lang:'Language',cur:'Currency (display only, no conversion)',theme:'Theme',auto:'Automatic',lt:'Light',dk:'Dark',remOn:'Warn about debts coming due',dbf:'Warn in advance by',d0:'On the day',dn:'{n} day(s)',remB:'{n} debt(s) due soon or overdue',pin:'PIN lock',setPin:'Set PIN',rmPin:'Remove PIN',npin:'New PIN (4 to 6 digits):',pinBad:'Invalid PIN.',unlock:'Enter PIN',entrar:'Unlock',wrong:'Wrong PIN.',bk:'Backup',exp:'Export',pdf:'Export PDF',imp:'Import',impd:'{n} debt(s) imported.',inv:'Invalid file.',wipe:'Erase all data',about:'About the app',aboutDesc:'Payoff is an app designed to help you organize and track personal debts simply and clearly. You can record amounts you owe or are owed, add partial payments, check outstanding balances, and review due dates and payment history. Its goal is to make everyday money management easier, reduce missed payments, and help you decide which commitments need attention first.',creator:'Creator',company:'Developed by',license:'License',licenseText:'Proprietary — all rights reserved. Copying, modifying, or distributing this app requires permission from the rights holder.',report:'Report a problem',suggest:'Suggest an improvement',reportSubject:'Problem report — Dívidas app',reportBody:'Hello, I found a problem in the Dívidas app.\\n\\nProblem description:\\n\\nPhone model and app version (if possible):',cwipe:'Erase ALL debts? This cannot be undone.',ver:'Version',ok:'You have the latest version.',upd:'Update available',updN:'Update now',chk:'Check for update',off:'No internet connection.',showNotes:'See what’s new in this update',hideNotes:'Hide update details',calcTitle:'Calculator',calcCopy:'Copy result',phone:'Phone (optional)',pickContact:'Choose contact',trashTitle:'Trash',trashRetention:'Automatically delete after',trashRetentionHint:'Records stay here for the selected period and are then deleted automatically.',openTrash:'View trash',trashEmpty:'The trash is empty.',restore:'Restore',deleteForever:'Delete permanently',deleteForeverConfirm:'Permanently delete this record?',releaseSummary:'• Configurable privacy: hide only “I owe”, “Owed to me” and net balance, or hide all record details.\n• More reliable closing of three-dot card menus when tapping outside.\n• Fixed WhatsApp/SMS button: expands with one tap, closes reliably and keeps only one menu open.\n• Update highlights shown as an organized list, even when the release only provides a “Full Changelog” link.\n• Full-screen trash with retention settings inside the trash.\n• Contact selection directly from the Android address book, with a permission request.\n• One expandable button for WhatsApp and SMS reminders.\n• Undo for record and payment edits.\n• A more detailed user guide in Settings.\n• General navigation and interface stability improvements.',guideTitle:'User guide',guideOpen:'Open user guide',guide1Title:'1. Create a record',guide1Text:'Tap “New record”, choose “I owe” or “Owed to me”, then enter the person and amount. You can add a phone number, due date and note.',guide2Title:'2. Record payments',guide2Text:'Open a record and tap “Record payment”. Enter the amount and date. The outstanding balance updates automatically.',guide3Title:'3. Correct information',guide3Text:'Open the record’s three-dot menu and choose “Edit”. You can also edit an individual payment in its history. Use “Undo” after an edit to reverse it.',guide4Title:'4. Reminders',guide4Text:'For “Owed to me” records with an outstanding balance, use WhatsApp or SMS to prepare a polite message with the current amount due.',guide5Title:'5. Trash',guide5Text:'Tap the trash icon at the top to view deleted records. Restore them or permanently delete them, and choose the automatic deletion period.',guide6Title:'6. Backups and updates',guide6Text:'Export a backup regularly in Settings. When an update is available, read its notes before tapping “Update now”.',guide7Title:'7. Hide accounts in public',guide7Text:'Open Settings and find “Account privacy”. Enable “Open the app with accounts hidden” so that names, amounts, payments and the net balance are blurred every time Payoff starts. When you are somewhere private, tap the eye button at the top to reveal the information temporarily. Tap it again to hide everything. This protects what is visible on screen, but it does not replace the PIN lock or encrypt data stored on the phone.',undo:'Undo',undoDone:'Change reverted.',undoEdit:'Edit saved. You can undo it.',phoneNeeded:'Enter the phone number to send the reminder:'},
+fr:{title:'Registre des dettes',owe:'Je dois',owed:'On me doit',late:'En retard',net:'Solde net',open:'En cours',paidT:'Soldées',empty:'Aucune dette ici.',add:'+ Nouveau registre',nd:'Nouveau registre',who:'Personne',name:'Nom',amt:'Montant',dte:'Date de la dette',due:'Échéance (facultatif)',note:'Note (facultatif)',save:'Enregistrer',cancel:'Annuler',pay:'Enregistrer un paiement',payv:'Montant payé',payd:'Date',reg:'Enregistrer',addDebtBtn:'Ajouter une dette',addDebtTitle:'Ajouter une dette',addDebtSave:'Ajouter',addDebtInfo:'Ce montant sera ajouté au total de cet enregistrement.',addHistory:'Dette ajoutée',pend:'En attente',part:'Partiel',liq:'Soldée',he:'Me doit',iow:'Je dois',since:'depuis',lim:'échéance',paidOf:'Payé {a} sur {b}',miss:'Reste {a}',hist:'Historique',edit:'Modifier',priority:'Priorité',low:'Basse',medium:'Moyenne',high:'Haute',more:'Plus d’options',e4:'Le montant ne peut pas être inférieur au montant déjà payé ({a}).',del:'Supprimer',nopay:'Aucun paiement.',cal:'Rappel',cdel:'Supprimer cette dette et son historique ?',e1:'Indiquez le nom et un montant valide.',e2:'Indiquez un montant valide.',e3:'Montant supérieur au reste ({a}).',set:'Paramètres',privacyTitle:'Confidentialité des comptes',privacyStart:'Ouvrir l’application avec les comptes masqués',privacyMode:'Que souhaitez-vous masquer ?',privacyTotals:'Masquer uniquement Je dois, On me doit et le solde net',privacyEverything:'Masquer toutes les informations des registres',privacyHint:'Choisissez de masquer uniquement les trois totaux du tableau de bord ou toutes les informations des cartes. Utilisez le bouton en forme d’œil pour afficher ou masquer temporairement.',showAccounts:'Afficher les comptes',hideAccounts:'Masquer les comptes',acc:'Couleur d’accentuation',ico:'Couleur de l’icône de l’écran d’accueil',icoN:'S’applique lors de l’ajout à l’écran d’accueil depuis le navigateur. Une icône déjà installée ne change pas : supprimez-la et ajoutez-la à nouveau.',amo:'Sombre AMOLED (noir pur)',close:'Fermer',lang:'Langue',cur:'Devise (affichage seulement, sans conversion)',theme:'Thème',auto:'Automatique',lt:'Clair',dk:'Sombre',remOn:'Prévenir des dettes à échéance',dbf:'Prévenir à l’avance de',d0:'Le jour même',dn:'{n} jour(s)',remB:'{n} dette(s) à échéance ou en retard',pin:'Verrouillage par PIN',setPin:'Définir un PIN',rmPin:'Supprimer le PIN',npin:'Nouveau PIN (4 à 6 chiffres) :',pinBad:'PIN invalide.',unlock:'Saisissez le PIN',entrar:'Entrer',wrong:'PIN incorrect.',bk:'Sauvegarde',exp:'Exporter',imp:'Importer',impd:'{n} dette(s) importée(s).',inv:'Fichier invalide.',wipe:'Effacer toutes les données',about:'À propos de l’application',aboutDesc:'Payoff est une application conçue pour organiser et suivre les dettes personnelles de manière simple et claire. Elle permet d’enregistrer les sommes dues ou à recevoir, d’ajouter des paiements partiels, de consulter les soldes restants et de suivre les échéances et l’historique. Son objectif est de faciliter la gestion financière quotidienne, d’éviter les oublis et d’aider à identifier les engagements prioritaires.',creator:'Créateur',company:'Entreprise développeuse',license:'Licence',licenseText:'Propriétaire — tous droits réservés. La copie, la modification ou la distribution de cette application nécessitent l’autorisation du titulaire des droits.',report:'Signaler un problème',reportSubject:'Signalement — application Dívidas',reportBody:'Bonjour, j’ai rencontré un problème dans l’application Dívidas.\\n\\nDescription du problème :\\n\\nModèle du téléphone et version de l’application (si possible) :',cwipe:'Effacer TOUTES les dettes ? Irréversible.',ver:'Version',ok:'Vous avez la dernière version.',upd:'Mise à jour disponible',updN:'Mettre à jour',chk:'Vérifier la mise à jour',off:'Pas de connexion.',showNotes:'Voir les nouveautés de cette mise à jour',hideNotes:'Masquer les nouveautés',calcTitle:'Calculatrice',calcCopy:'Copier le résultat',phone:'Téléphone (facultatif)',pickContact:'Choisir un contact',trashTitle:'Corbeille',trashRetention:'Suppression automatique après',trashRetentionHint:'Les enregistrements restent ici pendant la période choisie, puis sont supprimés automatiquement.',openTrash:'Voir la corbeille',trashEmpty:'La corbeille est vide.',restore:'Restaurer',deleteForever:'Supprimer définitivement',deleteForeverConfirm:'Supprimer définitivement cet enregistrement ?',releaseSummary:'• Confidentialité configurable : masquer uniquement « Je dois », « On me doit » et le solde net, ou toutes les données des registres.\n• Fermeture plus fiable des menus à trois points en touchant à l’extérieur.\n• Bouton WhatsApp/SMS corrigé : ouverture en un toucher, fermeture fiable et un seul menu ouvert à la fois.\n• Nouveautés de la mise à jour présentées dans une liste organisée, même si la publication ne fournit qu’un lien « Full Changelog ».\n• Corbeille en plein écran avec gestion du délai de conservation.\n• Sélection des contacts directement depuis le répertoire Android, avec demande d’autorisation.\n• Un seul bouton extensible pour les rappels WhatsApp et SMS.\n• Annulation des modifications des registres et paiements.\n• Guide d’utilisation plus détaillé dans les paramètres.\n• Améliorations générales de la navigation et de la stabilité.',guideTitle:'Guide d’utilisation',guideOpen:'Ouvrir le guide',guide1Title:'1. Créer un enregistrement',guide1Text:'Touchez « Nouveau registre », choisissez « Je dois » ou « On me doit », puis saisissez la personne et le montant. Vous pouvez ajouter un téléphone, une échéance et une note.',guide2Title:'2. Enregistrer les paiements',guide2Text:'Ouvrez un registre et touchez « Enregistrer un paiement ». Saisissez le montant et la date. Le solde restant est mis à jour automatiquement.',guide3Title:'3. Corriger les informations',guide3Text:'Dans le menu à trois points, choisissez « Modifier ». Vous pouvez aussi modifier un paiement individuel dans son historique. Utilisez « Annuler » après une modification pour la rétablir.',guide4Title:'4. Rappels',guide4Text:'Pour les enregistrements « On me doit » avec un solde restant, utilisez WhatsApp ou SMS pour préparer un message poli avec le montant actuel.',guide5Title:'5. Corbeille',guide5Text:'Touchez l’icône de la corbeille en haut pour voir les éléments supprimés. Vous pouvez les restaurer ou les supprimer définitivement et choisir le délai de suppression automatique.',guide6Title:'6. Sauvegardes et mises à jour',guide6Text:'Exportez régulièrement une sauvegarde dans les paramètres. Lorsqu’une mise à jour est disponible, consultez les nouveautés avant de toucher « Mettre à jour ».',guide7Title:'7. Masquer les comptes en public',guide7Text:'Ouvrez les Paramètres et recherchez « Confidentialité des comptes ». Activez « Ouvrir l’application avec les comptes masqués » pour que les noms, montants, paiements et le solde net soient floutés à chaque démarrage de Payoff. Dans un endroit privé, touchez le bouton en forme d’œil en haut pour afficher temporairement les informations. Touchez-le à nouveau pour tout masquer. Cette option protège ce qui est visible à l’écran, mais ne remplace pas le verrouillage par PIN et ne chiffre pas les données stockées sur le téléphone.',undo:'Annuler',undoDone:'Modification annulée.',undoEdit:'Modification enregistrée. Vous pouvez l’annuler.',phoneNeeded:'Saisissez le numéro de téléphone pour envoyer le rappel :'}};
+var editingPayIndex=null;var TRASH=g('payoff_trash',[]);var undoSnapshot=null,undoTimer=null;var V='1.1.0',NV='',NVNotes='',SYM={MZN:'MT',USD:'US$',EUR:'€',ZAR:'R',BRL:'R$',AOA:'Kz',GBP:'£'};
+var P={lang:'',ac:'#0a84ff',ic:'',cur:'MZN',theme:'auto',rem:false,days:1,pin:'',ln:''},S=[],filter='todas',kind='devo',payId=null,addDebtId=null,editId=null,menuOpenId=null,contactOpen={},open={},upd=false;
+function g(k,d){try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}}
+S=g('dividas',[]);var p0=g('dv_prefs',{});for(var k in p0)P[k]=p0[k];if(P.privacyMode!=='all'&&P.privacyMode!=='totals')P.privacyMode='all';function applyPrivacy(hidden){var root=document.documentElement;root.classList.toggle('privacy-hidden',!!hidden&&P.privacyMode==='all');root.classList.toggle('privacy-summary',!!hidden&&P.privacyMode==='totals');var eye=document.getElementById('privacyToggle');if(eye){eye.setAttribute('aria-pressed',hidden?'true':'false');eye.title=t(hidden?'showAccounts':'hideAccounts')}}applyPrivacy(!!P.hideAccounts);
+if(!T[P.lang]){var nl=(navigator.language||'').slice(0,2);P.lang=T[nl]?nl:'pt'}
+function sv(){try{localStorage.setItem('dividas',JSON.stringify(S))}catch(e){}}
+function uniqueDebtId(){var id;do{id=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12)}while(S.some(function(d){return d&&d.id===id}));return id}
+var debtIdsSeen=Object.create(null),debtIdsMigrated=false;
+S.forEach(function(d){if(!d||!d.id||debtIdsSeen[String(d.id)]){d.id=uniqueDebtId();d._updatedAt=Date.now();debtIdsMigrated=true}debtIdsSeen[String(d.id)]=true});
+if(debtIdsMigrated)sv();
+var priorityMigrated=false;S.forEach(function(d){if(d.priority==='baixa'){d.priority='low';priorityMigrated=true}else if(d.priority==='media'){d.priority='medium';priorityMigrated=true}else if(d.priority==='alta'){d.priority='high';priorityMigrated=true}else if(['low','medium','high'].indexOf(d.priority)<0){d.priority='medium';priorityMigrated=true}});if(priorityMigrated)sv();
+function sp(){try{localStorage.setItem('dv_prefs',JSON.stringify(P))}catch(e){}}function trashSv(){try{localStorage.setItem('payoff_trash',JSON.stringify(TRASH))}catch(e){}}function purgeTrash(){var days=Number(P.trashDays)||30,cut=Date.now()-days*86400000,old=TRASH.length;TRASH=TRASH.filter(function(d){return d&&Number(d._deletedAt||0)>cut});if(TRASH.length!==old)trashSv()}if(![7,15,30].includes(Number(P.trashDays)))P.trashDays=30;purgeTrash();
+var $=function(s){return document.querySelector(s)};
+function calcParse(input){var src=String(input||'').replace(/\s+/g,'');if(!src)return NaN;var tokens=src.match(/(?:\d+\.?\d*|\.\d+)|[()+\-*/]/g)||[];if(tokens.join('')!==src)throw new Error('Expressão inválida');var i=0;function factor(){var x=tokens[i++];if(x==='+')return factor();if(x==='-')return -factor();if(x==='('){var v=expr();if(tokens[i++]!==')')throw new Error('Parênteses inválidos');return v}if(!x||!/^\d*\.?\d+$/.test(x))throw new Error('Número inválido');return Number(x)}function term(){var v=factor();while(tokens[i]==='*'||tokens[i]==='/'){var op=tokens[i++],n=factor();v=op==='*'?v*n:v/n}return v}function expr(){var v=term();while(tokens[i]==='+'||tokens[i]==='-'){var op=tokens[i++],n=term();v=op==='+'?v+n:v-n}return v}var result=expr();if(i!==tokens.length||!Number.isFinite(result))throw new Error('Cálculo inválido');return Number(result.toPrecision(12))}
+function t(k,o){var s=(T[P.lang]||T.pt)[k]||T.pt[k]||k;if(o)for(var i in o)s=s.replace('{'+i+'}',o[i]);return s}
+var today=function(){return new Date().toISOString().slice(0,10)};
+var fmt=function(n){return new Intl.NumberFormat(P.lang,{maximumFractionDigits:2}).format(n)+' '+SYM[P.cur]};
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var paid=function(d){return d.pays.reduce(function(a,p){return a+p.a},0)};
+var bal=function(d){return Math.max(0,d.total-paid(d))};
+var late=function(d){return bal(d)>0&&d.due&&d.due<today()};
+var dt=function(s){return s?s.split('-').reverse().join('/'):''};
+function due(){var l=new Date();l.setDate(l.getDate()+P.days);var x=l.toISOString().slice(0,10);return S.filter(function(d){return bal(d)>0&&d.due&&d.due<=x})}
+function applyI(){document.documentElement.lang=P.lang;document.querySelectorAll('[data-i]').forEach(function(e){e.textContent=t(e.dataset.i)});document.querySelectorAll('[data-p]').forEach(function(e){e.placeholder=t(e.dataset.p)})}
+function applyTheme(){var r=document.documentElement,m=document.querySelector('meta[name=theme-color]');if(P.theme==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',P.theme);r.style.setProperty('--ac',P.ac);var d=P.theme==='dark'||P.theme==='amoled'||(P.theme==='auto'&&matchMedia('(prefers-color-scheme:dark)').matches);if(m)m.content=P.theme==='amoled'?'#000000':d?'#0b0b10':'#f2f2f7'}
+function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
+function mkIc(z,c){var k=document.createElement('canvas');k.width=k.height=z;var x=k.getContext('2d'),u=z/100;x.fillStyle=c;x.fillRect(0,0,z,z);x.fillStyle='#fff';rr(x,28*u,22*u,44*u,56*u,6*u);x.fill();x.fillStyle=c;[36,48,60].forEach(function(y){x.fillRect(36*u,y*u,28*u,4*u)});x.fillStyle='#ff3b30';x.fillRect(36*u,70*u,16*u,3*u);return k.toDataURL('image/png')}
+function applyIcon(){
+ var c=P.ic,d=!c||c==='#1d6b57',m=document.querySelector('link[rel=manifest]'),a=d?'icon-192.png':mkIc(192,c);
+ document.querySelectorAll('link[rel=icon],link[rel=apple-touch-icon]').forEach(function(l){l.href=a});
+ if(d){m.href='manifest.json';return}
+ var u=location.origin+location.pathname;
+ m.href=URL.createObjectURL(new Blob([JSON.stringify({name:'Registo de Dívidas',short_name:'Dívidas',start_url:u,scope:u,display:'standalone',background_color:c,theme_color:c,lang:'pt',icons:[{src:a,sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:mkIc(512,c),sizes:'512x512',type:'image/png',purpose:'any maskable'}]})],{type:'application/manifest+json'}));
+}
+var PAL=['#0a84ff','#1d6b57','#ff9f0a','#ff453a','#bf5af2','#1c1c1e'];
+function sws(){var cur=P.ac||'#0a84ff';$('#swA').innerHTML=PAL.map(function(c){return '<button class="sw'+(c===cur?' on':'')+'" style="background:'+c+'" data-c="'+c+'" data-key="ac"></button>'}).join('')+'<label class="colorPick" aria-label="Selecionar cor" title="Selecionar cor"><span></span><input type="color" class="cp" value="'+cur+'" data-key="ac" aria-label="Selecionar cor"></label>'}
+function setC(k,c){P[k]=c;sp();applyTheme();sws()}
+$('#ovSet').addEventListener('click',function(e){var b=e.target.closest('.sw');if(b)setC(b.dataset.key,b.dataset.c)});
+$('#ovSet').addEventListener('change',function(e){if(e.target.classList.contains('cp'))setC(e.target.dataset.key,e.target.value)});
+function dl(n,m,x){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([x],{type:m}));a.download=n;document.body.appendChild(a);a.click();a.remove()}
+function render(){
+ var devo=0,devem=0,atr=0;
+ S.forEach(function(d){var b=bal(d);if(d.kind==='devo')devo+=b;else devem+=b;if(late(d))atr++});
+ $('#sDevo').textContent=fmt(devo);$('#sDevem').textContent=fmt(devem);$('#sAtr').textContent=atr;
+ var n=devem-devo,e=$('#sNet');e.textContent=fmt(n);e.className=n<0?'red':'grn';
+ var c=P.rem?due().length:0,r=$('#rem');r.style.display=c?'block':'none';r.textContent='⏰ '+t('remB',{n:c});
+ var L=S.filter(function(d){var o=bal(d)>0;if(filter==='pagas')return !o;if(!o)return false;return filter==='todas'||d.kind===filter}).sort(function(a,b){var rank={high:0,medium:1,low:2};var pa=rank[a.priority||'medium'],pb=rank[b.priority||'medium'];return pa!==pb?pa-pb:(a.due||'9999').localeCompare(b.due||'9999')});
+ if(!L.length){$('#list').innerHTML='<div class="empty">'+t('empty')+'</div>';return}
+ $('#list').innerHTML=L.map(function(d){
+  var p=paid(d),b=bal(d),pc=Math.min(100,p/d.total*100),st,cl;
+  if(b<=0){st=t('liq');cl='grn'}else if(late(d)){st=t('late');cl='red'}else if(p>0){st=t('part');cl='amb'}else{st=t('pend');cl='mut'}
+  var h=(d.additions||[]).map(function(x){return '<div>＋ '+t('addHistory')+' · '+dt(x.d)+' — '+fmt(x.a)+(x.note?' · '+esc(x.note):'')+'</div>'}).join('')+(d.pays.map(function(x,i){return '<div class="payment-history-row"><span>'+dt(x.d)+' — '+fmt(x.a)+'</span><button type="button" class="btn" data-editpay="'+d.id+'" data-payindex="'+i+'">'+t('edit')+'</button></div>'}).join(''));if(!h)h=t('nopay');
+  return '<div class="item" data-debt-id="'+d.id+'"><div class="item-head"><div><div class="nm">'+esc(d.person)+'</div><div class="mut">'+(d.kind==='devo'?t('iow'):t('he'))+' · '+t('since')+' '+dt(d.date)+(d.due?' · '+t('lim')+' '+dt(d.due):'')+'</div><span class="priority-badge p-'+(d.priority==='high'?'high':d.priority==='low'?'low':'medium')+'">'+t(d.priority==='high'?'high':d.priority==='low'?'low':'medium')+'</span></div><div class="more-wrap"><button class="more-btn" type="button" data-menu="'+d.id+'" aria-label="'+t('more')+'" aria-expanded="'+(menuOpenId===d.id?'true':'false')+'">⋮</button>'+(menuOpenId===d.id?'<div class="more-menu"><button type="button" data-edit="'+d.id+'">'+t('edit')+'</button><button type="button" class="dng" data-del="'+d.id+'">'+t('del')+'</button></div>':'')+'</div><span class="tag '+cl+'">'+st+'</span></div>'
+  +(d.note?'<div class="mut" style="margin-top:6px">'+esc(d.note)+'</div>':'')
+  +'<div class="bar"><i style="width:'+pc+'%"></i></div>'
+  +'<div class="row mut"><span>'+t('paidOf',{a:fmt(p),b:fmt(d.total)})+'</span><b style="color:var(--tx)">'+t('miss',{a:fmt(b)})+'</b></div>'
+  +(open[d.id]?'<div class="hist">'+h+'</div>':'')
+  +'<div class="acts"><div class="message-actions"><button type="button" class="message-toggle" data-contact-toggle="'+d.id+'" aria-expanded="'+(contactOpen[d.id]?'true':'false')+'" aria-label="'+t('messageActions')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 2h9A3.5 3.5 0 0 1 20 5.5v6a3.5 3.5 0 0 1-3.5 3.5H11l-4.5 3v-3.2A3.5 3.5 0 0 1 4 11.5z"/><path d="M8 8h8M8 11h5"/><path d="M15.5 17.5H18l2.5 2v-3.2"/></svg></button>'+(contactOpen[d.id]?'<div class="message-options"><button type="button" class="contact-action" data-whatsapp-id="'+d.id+'">WhatsApp</button><button type="button" data-sms-id="'+d.id+'">SMS</button></div>':'')+'</div>'+(b>0?'<button class="pri" data-pay="'+d.id+'">'+t('pay')+'</button>':'')+'<button data-adddebt="'+d.id+'">'+t('addDebtBtn')+'</button>'+(b>0&&d.due?'<button data-ics="'+d.id+'">🔔 '+t('cal')+'</button>':'')+'<button data-h="'+d.id+'">'+t('hist')+'</button></div></div>';
+ }).join('');
+}
+function show(id,on){$(id).classList.toggle('on',on)}
+function offerUndo(snapshot){undoSnapshot=snapshot;if(undoTimer)clearTimeout(undoTimer);$('#undoText').textContent=t('undoEdit');$('#undoBar').classList.add('on');undoTimer=setTimeout(function(){undoSnapshot=null;$('#undoBar').classList.remove('on')},10000)}
+$('#undoAction').onclick=function(){if(!undoSnapshot)return;S=JSON.parse(undoSnapshot);undoSnapshot=null;if(undoTimer)clearTimeout(undoTimer);sv();render();$('#undoBar').classList.remove('on')};
+$('#tabs').onclick=function(e){var f=e.target.dataset.f;if(!f)return;filter=f;[].forEach.call($('#tabs').children,function(b){b.classList.toggle('on',b.dataset.f===f)});render()};
+function setKind(k){kind=k;[].forEach.call($('#kind').children,function(b){b.classList.toggle('pri',b.dataset.k===k)})}
+function setPriority(value){var v=['low','medium','high'].indexOf(value)>=0?value:'medium';$('#fPriority').value=v;document.querySelectorAll('[data-priority-choice]').forEach(function(b){b.classList.toggle('selected',b.dataset.priorityChoice===v)})}
+$('#priorityOptions').onclick=function(e){var b=e.target.closest('[data-priority-choice]');if(b)setPriority(b.dataset.priorityChoice)};$('#pickContact').onclick=async function(){try{var nativeContacts=window.DividasNative&&window.DividasNative.Contacts;if(nativeContacts&&typeof nativeContacts.pickContact==='function'){var c=await nativeContacts.pickContact();if(c){$('#fP').value=c.name||c.displayName||$('#fP').value;$('#fPhone').value=c.phoneNumber||c.tel||$('#fPhone').value;return}}if(navigator.contacts&&navigator.contacts.select){var contacts=await navigator.contacts.select(['name','tel'],{multiple:false});if(contacts&&contacts[0]){if(contacts[0].name&&contacts[0].name[0])$('#fP').value=contacts[0].name[0];if(contacts[0].tel&&contacts[0].tel[0])$('#fPhone').value=contacts[0].tel[0];return}}alert('A agenda nativa ainda não está ligada nesta versão. Pode introduzir o número manualmente.')}catch(e){if(e&&e.name!=='AbortError')alert('Não foi possível aceder aos contactos. Pode introduzir o número manualmente.')}};
+function resetDebtForm(){editId=null;$('#fP').value='';$('#fPhone').value='';$('#fV').value='';$('#fN').value='';$('#fL').value='';$('#fD').value=today();setPriority('medium');$('#ovAdd h2').textContent=t('nd');$('#saveAdd').textContent=t('save');setKind('devo')}
+$('#add').onclick=function(){resetDebtForm();show('#ovAdd',true)};
+$('#kind').onclick=function(e){var k=e.target.dataset.k;if(k)setKind(k)};
+document.querySelectorAll('[data-close]').forEach(function(b){b.onclick=function(){var modal=b.closest('.ov');if(modal)show('#'+modal.id,false)}});
+$('#saveAdd').onclick=function(){
+ var p=$('#fP').value.trim(),v=parseFloat($('#fV').value),d=editId?S.find(function(x){return x.id===editId}):null,undoBefore=d?JSON.stringify(S):null;
+ if(!p||!(v>0)){alert(t('e1'));return}
+ if(d&&v<paid(d)){alert(t('e4',{a:fmt(paid(d))}));return}
+ if(d){d.person=p;d.kind=kind;d.total=v;d.date=$('#fD').value||today();d.due=$('#fL').value;d.note=$('#fN').value.trim();d.phone=$('#fPhone').value.trim();d.priority=$('#fPriority').value;d._updatedAt=Date.now()}
+ else {var existing=S.find(function(x){return x&&x.kind===kind&&String(x.person||'').trim().toLocaleLowerCase()===p.toLocaleLowerCase()});if(existing){if(!Array.isArray(existing.additions))existing.additions=[];existing.additions.push({d:$('#fD').value||today(),a:v,note:$('#fN').value.trim()});existing.total=Number(existing.total||0)+v;existing._updatedAt=Date.now()}else S.push({id:uniqueDebtId(),kind:kind,person:p,total:v,date:$('#fD').value||today(),due:$('#fL').value,note:$('#fN').value.trim(),phone:$('#fPhone').value.trim(),priority:$('#fPriority').value,pays:[],_updatedAt:Date.now()})}
+ sv();if(undoBefore)offerUndo(undoBefore);show('#ovAdd',false);editId=null;menuOpenId=null;filter='todas';[].forEach.call($('#tabs').children,function(b){b.classList.toggle('on',b.dataset.f==='todas')});render();
+};
+document.addEventListener('click',function(e){var target=e.target;var insideMore=!!target.closest('.more-wrap'),insideMessages=!!target.closest('.message-actions');var menuToClose=menuOpenId!==null&&!insideMore?menuOpenId:null;var closeMessages=Object.keys(contactOpen).some(function(k){return contactOpen[k]})&&!insideMessages;if(menuToClose!==null||closeMessages){setTimeout(function(){var changed=false;if(menuToClose!==null&&menuOpenId===menuToClose){menuOpenId=null;changed=true}if(closeMessages&&!target.closest('.message-actions')){Object.keys(contactOpen).forEach(function(k){if(contactOpen[k]){contactOpen[k]=false;changed=true}})}if(changed)render()},0)}});
+$('#list').onclick=async function(e){
+ var x=e.target.closest('button')||e.target,id;
+ if(id=x.dataset.menu){menuOpenId=menuOpenId===id?null:id;render();return}
+ if(id=x.dataset.pay){payId=id;var d=S.find(function(y){return y.id===id});$('#payInfo').textContent=d.person+' — '+t('miss',{a:fmt(bal(d))});editingPayIndex=null;$('#ovPay h2').textContent=t('pay');$('#savePay').textContent=t('reg');$('#pV').value='';$('#pD').value=today();show('#ovPay',true)}
+ else if(id=x.dataset.editpay){var d=S.find(function(y){return y.id===x.dataset.editpay});var i=Number(x.dataset.payindex);if(!d||!Number.isInteger(i)||!d.pays[i])return;payId=id=x.dataset.editpay;editingPayIndex=i;$('#payInfo').textContent=d.person+' — '+t('edit');$('#ovPay h2').textContent=t('edit');$('#savePay').textContent=t('save');$('#pV').value=d.pays[i].a;$('#pD').value=d.pays[i].d||today();show('#ovPay',true)}
+ else if(id=x.dataset.adddebt){var d=S.find(function(y){return y.id===id});if(!d)return;addDebtId=id;$('#addDebtInfo').textContent=d.person+' — '+t('miss',{a:fmt(bal(d))});$('#aV').value='';$('#aD').value=today();$('#aN').value='';show('#ovAddDebt',true)}
+ else if(id=x.dataset.edit){var d=S.find(function(y){return y.id===id});if(!d)return;editId=id;$('#fP').value=d.person||'';$('#fPhone').value=d.phone||'';$('#fV').value=d.total;$('#fN').value=d.note||'';$('#fD').value=d.date||today();$('#fL').value=d.due||'';setPriority(d.priority||'medium');setKind(d.kind||'devo');menuOpenId=null;$('#ovAdd h2').textContent=t('edit');$('#saveAdd').textContent=t('save');show('#ovAdd',true)}
+  else if(id=x.dataset.h){open[id]=!open[id];render()}
+ else if(x.dataset.contactToggle){var cid=x.dataset.contactToggle,wasOpen=!!contactOpen[cid];contactOpen={};if(!wasOpen)contactOpen[cid]=true;render()}
+ else if(x.dataset.whatsappId||x.dataset.smsId){var debtId=x.dataset.whatsappId||x.dataset.smsId,d=S.find(function(y){return y.id===debtId});if(!d)return;var phone=String(d.phone||'').trim();if(!phone){phone=prompt(t('phoneNeeded'));if(phone===null)return;phone=phone.trim();if(!phone)return;d.phone=phone;d._updatedAt=Date.now();sv();render()}var digits=phone.replace(/[^0-9]/g,'');if(!digits){alert('Introduza um número válido com indicativo do país.');return}var msg=d.kind==='devem'?'Olá '+(d.person||'')+'! Tudo bem? 😊 Passo apenas para lembrar que existe um valor de '+fmt(bal(d))+' por regularizar a nosso favor. Quando tiveres oportunidade, agradeço que possas regularizar. Obrigado!':'Olá '+(d.person||'')+'! Tudo bem? 😊 Passo para confirmar o valor pendente de '+fmt(bal(d))+' que tenho para regularizar contigo. Obrigado!';try{var actions=window.DividasNative&&window.DividasNative.MessageActions;if(actions){if(x.dataset.whatsappId){await actions.openWhatsApp({phone:digits,message:msg})}else{await actions.openSms({phone:digits,message:msg})}}else{var url=x.dataset.whatsappId?'https://wa.me/'+digits+'?text='+encodeURIComponent(msg):'sms:'+digits+'?body='+encodeURIComponent(msg);window.location.href=url}}catch(err){console.error('Falha ao abrir aplicação de mensagens:',err);alert(x.dataset.whatsappId?'Não foi possível abrir o WhatsApp. Verifique se está instalado.':'Não foi possível abrir a aplicação de SMS. Verifique se existe uma aplicação de mensagens configurada.')}}
+ else if(id=x.dataset.ics){ics(S.find(function(y){return y.id===id}))}
+ else if(id=x.dataset.del){if(confirm(t('cdel'))){var d=S.find(function(y){return y.id===id});if(d){d._deletedAt=Date.now();TRASH.unshift(d);S=S.filter(function(y){return y.id!==id});trashSv();sv();render()}}}
+};
+$('#saveAddDebt').onclick=function(){
+ var d=S.find(function(x){return x.id===addDebtId}),v=parseFloat($('#aV').value),note=$('#aN').value.trim();
+ if(!d||!(v>0)){alert(t('e2'));return}
+ if(!Array.isArray(d.additions))d.additions=[];
+ var date=$('#aD').value||today();
+ d.additions.push({d:date,a:v,note:note});
+ d.total=Number(d.total||0)+v;
+ d._updatedAt=Date.now();
+ sv();show('#ovAddDebt',false);addDebtId=null;render();
+};
+$('#savePay').onclick=function(){
+ var d=S.find(function(x){return x.id===payId}),v=parseFloat($('#pV').value);
+ if(!d||!(v>0)){alert(t('e2'));return}
+ var old=editingPayIndex!==null&&d.pays[editingPayIndex]?Number(d.pays[editingPayIndex].a)||0:0,undoBefore=editingPayIndex!==null?JSON.stringify(S):null;
+ if(v>bal(d)+old){alert(t('e3',{a:fmt(bal(d)+old)}));return}
+ var payment={d:$('#pD').value||today(),a:v};
+ if(editingPayIndex!==null&&d.pays[editingPayIndex])d.pays[editingPayIndex]=payment;else d.pays.push(payment);
+ editingPayIndex=null;d._updatedAt=Date.now();sv();if(undoBefore)offerUndo(undoBefore);show('#ovPay',false);render();
+};
+function ics(d){
+ var n=new Date(d.due+'T00:00:00');n.setDate(n.getDate()+1);
+ var h=P.days*24-9,tr=(h<0?'':'-')+'PT'+Math.abs(h)+'H',tx=((d.kind==='devo'?t('iow'):t('he'))+': '+d.person+' '+fmt(bal(d))).replace(/[,;\n]/g,' ');
+ var s=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Dividas//EN','BEGIN:VEVENT','UID:'+d.id+'@dividas','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z','DTSTART;VALUE=DATE:'+d.due.replace(/-/g,''),'DTEND;VALUE=DATE:'+n.toISOString().slice(0,10).replace(/-/g,''),'SUMMARY:'+tx,'BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+tx,'TRIGGER:'+tr,'END:VALARM','END:VEVENT','END:VCALENDAR'];
+ dl('lembrete-'+d.id+'.ics','text/calendar',s.join('\r\n'));
+}
+/* settings */
+$('#sC').innerHTML=Object.keys(SYM).map(function(c){return '<option value="'+c+'">'+c+' — '+SYM[c]+'</option>'}).join('');
+function fillSet(){
+ $('#sL').value=P.lang;$('#sC').value=P.cur;$('#sT').value=P.theme;$('#sR').checked=P.rem;$('#sPrivacy').checked=!!P.hideAccounts;$('#sPrivacyMode').value=P.privacyMode||'all';
+ $('#sD').innerHTML=[0,1,3,7].map(function(n){return '<option value="'+n+'">'+(n?t('dn',{n:n}):t('d0'))+'</option>'}).join('');$('#sD').value=P.days;
+ $('#pinB').textContent=P.pin?t('rmPin'):t('setPin');$('#vv').textContent=t('ver')+' '+V;uiUpd();sws();
+}
+$('#gear').onclick=function(){fillSet();show('#ovSet',true)};$('#trashToggle').onclick=function(){renderTrash();$('#trashDays').value=String(P.trashDays||30);show('#ovTrash',true)};$('#openGuide').onclick=function(){show('#ovGuide',true)};$('#trashDays').onchange=function(){P.trashDays=Number(this.value)||30;sp();purgeTrash();renderTrash()};function renderTrash(){var box=$('#trashList');if(!TRASH.length){box.innerHTML='<div class="empty">'+t('trashEmpty')+'</div>';return}box.innerHTML=TRASH.map(function(d){return '<div class="item"><div class="nm">'+esc(d.person||'')+'</div><div class="mut">'+fmt(bal(d))+' · '+dt(d.date)+'</div><div class="acts"><button class="btn pri" data-restore="'+d.id+'">'+t('restore')+'</button><button class="btn dng" data-purge="'+d.id+'">'+t('deleteForever')+'</button></div></div>'}).join('')}$('#trashList').onclick=function(e){var id=e.target.dataset.restore||e.target.dataset.purge;if(!id)return;var d=TRASH.find(function(x){return x.id===id});if(!d)return;if(e.target.dataset.restore){delete d._deletedAt;S.push(d);TRASH=TRASH.filter(function(x){return x.id!==id});sv();trashSv();renderTrash();render();fillSet()}else if(confirm(t('deleteForeverConfirm'))){TRASH=TRASH.filter(function(x){return x.id!==id});trashSv();renderTrash();fillSet()}};
+var calcExpression='',calcValue=null,calcHistory=[];try{var savedCalcHistory=JSON.parse(localStorage.getItem('payoff_calc_history')||'[]');if(Array.isArray(savedCalcHistory))calcHistory=savedCalcHistory.slice(0,10)}catch(_){}function calcSaveHistory(expression,value){calcHistory.unshift({expression:expression,result:String(value)});calcHistory=calcHistory.slice(0,10);try{localStorage.setItem('payoff_calc_history',JSON.stringify(calcHistory))}catch(_){}calcRenderHistory()}function calcRenderHistory(){var box=$('#calcHistory');if(!box)return;box.textContent='';if(!calcHistory.length){var empty=document.createElement('div');empty.textContent='Ainda não há cálculos.';empty.style.cssText='padding:8px 4px;color:var(--mut);font-size:12px';box.appendChild(empty);return}calcHistory.forEach(function(item){var b=document.createElement('button'),a=document.createElement('span'),v=document.createElement('strong');a.textContent=item.expression;v.textContent=item.result;b.appendChild(a);b.appendChild(v);b.onclick=function(){calcExpression=item.expression;calcRefresh();box.classList.remove('on')};box.appendChild(b)})}function calcRefresh(){var d=$('#calcDisplay'),r=$('#calcResult'),c=$('#calcCopy');if(d)d.textContent=calcExpression||'0';try{calcValue=calcExpression?calcParse(calcExpression):null;if(r)r.textContent=calcValue===null?'': '= '+String(calcValue)}catch(e){calcValue=null;if(r)r.textContent=''}if(c)c.disabled=calcValue===null}function calcClosePanel(){var p=$('#calcPanel');if(!p.classList.contains('on'))return;p.classList.remove('on');p.classList.add('closing');p.setAttribute('aria-hidden','true');window.setTimeout(function(){p.classList.remove('closing')},170)}$('#calcToggle').onclick=function(){var panel=$('#calcPanel'),on=!panel.classList.contains('on');if(on){panel.classList.remove('closing');panel.classList.add('on');panel.setAttribute('aria-hidden','false');calcRefresh()}else calcClosePanel()};$('#calcClose').onclick=calcClosePanel;$('#calcKeys').onclick=function(e){var b=e.target.closest('[data-cal]');if(!b)return;var k=b.dataset.cal;if(k==='clear')calcExpression='';else if(k==='back')calcExpression=calcExpression.slice(0,-1);else if(k==='='){try{var before=calcExpression;calcValue=calcParse(calcExpression);calcExpression=String(calcValue);calcSaveHistory(before,calcValue)}catch(_){}}else if(k==='(')calcExpression+=(calcExpression.split('(').length-1>calcExpression.split(')').length-1?')':'(');else calcExpression+=k;calcRefresh()};$('#calcCopy').onclick=function(){if(calcValue===null)return;var value=String(calcValue);if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(value).catch(function(){var x=document.createElement('textarea');x.value=value;document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(_){}x.remove()});else{var x=document.createElement('textarea');x.value=value;document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(_){}x.remove()}};$('#calcHistoryToggle').onclick=function(){var box=$('#calcHistory');box.classList.toggle('on');if(box.classList.contains('on'))calcRenderHistory()};(function(){var panel=$('#calcPanel'),bar=$('#calcDrag'),drag=false,sx=0,sy=0,ox=0,oy=0;if(!panel||!bar)return;bar.addEventListener('pointerdown',function(e){if(e.target.closest('button'))return;drag=true;var rect=panel.getBoundingClientRect();sx=e.clientX;sy=e.clientY;ox=rect.left;oy=rect.top;panel.style.right='auto';panel.style.bottom='auto';panel.style.left=ox+'px';panel.style.top=oy+'px';try{bar.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault()});bar.addEventListener('pointermove',function(e){if(!drag)return;var maxX=window.innerWidth-panel.offsetWidth,maxY=window.innerHeight-panel.offsetHeight;var x=Math.max(4,Math.min(maxX,ox+e.clientX-sx)),y=Math.max(4,Math.min(maxY,oy+e.clientY-sy));panel.style.left=x+'px';panel.style.top=y+'px'});function stop(){drag=false}bar.addEventListener('pointerup',stop);bar.addEventListener('pointercancel',stop)})();calcRenderHistory();
+(function(){
+ var sheet=document.querySelector('#ovSet .sheet'),grab=document.querySelector('#ovSet .grab');
+ if(!sheet||!grab)return;
+ var startY=0,lastY=0,startTime=0,dragging=false;
+ grab.addEventListener('pointerdown',function(e){
+  startY=lastY=e.clientY;startTime=Date.now();dragging=true;
+  sheet.style.transition='none';
+  try{grab.setPointerCapture(e.pointerId)}catch(_){}
+  e.preventDefault();
+ });
+ grab.addEventListener('pointermove',function(e){
+  if(!dragging)return;
+  lastY=Math.max(0,e.clientY-startY);
+  sheet.style.transform='translateY('+lastY+'px)';
+ });
+ function finishSettingsDrag(){
+  if(!dragging)return;dragging=false;
+  var elapsed=Math.max(1,Date.now()-startTime),speed=lastY/elapsed;
+  sheet.style.transition='transform .22s ease';
+  if(lastY>100||speed>.65){
+   sheet.style.transform='translateY(110%)';
+   setTimeout(function(){show('#ovSet',false);sheet.style.transition='';sheet.style.transform=''},220);
+  }else{
+   sheet.style.transform='translateY(0)';
+   setTimeout(function(){sheet.style.transition='';sheet.style.transform=''},230);
+  }
+ }
+ grab.addEventListener('pointerup',finishSettingsDrag);
+ grab.addEventListener('pointercancel',finishSettingsDrag);
+})();
+$('#sL').onchange=function(){P.lang=this.value;sp();applyI();fillSet();render()};
+$('#sC').onchange=function(){P.cur=this.value;sp();render()};
+$('#sT').onchange=function(){P.theme=this.value;sp();applyTheme()};
+$('#sD').onchange=function(){P.days=+this.value;sp();render()};
+$('#sR').onchange=function(){P.rem=this.checked;sp();if(P.rem&&window.DividasRequestNotificationPermission)window.DividasRequestNotificationPermission();else if(window.DividasRefreshNotifications)window.DividasRefreshNotifications();render()};$('#sPrivacy').onchange=function(){P.hideAccounts=this.checked;sp();applyPrivacy(P.hideAccounts)};$('#sPrivacyMode').onchange=function(){P.privacyMode=this.value==='totals'?'totals':'all';sp();if(P.hideAccounts)applyPrivacy(true)};$('#privacyToggle').onclick=function(){var hidden=document.documentElement.classList.contains('privacy-hidden')||document.documentElement.classList.contains('privacy-summary');applyPrivacy(!hidden)};
+function hh(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return String(h)}
+$('#pinB').onclick=function(){
+ if(P.pin){P.pin='';sp();fillSet();return}
+ var p=prompt(t('npin'));if(p===null)return;
+ if(!/^\d{4,6}$/.test(p)){alert(t('pinBad'));return}
+ P.pin=hh(p+'dv');sp();fillSet();
+};
+function focusPin(){if(document.hidden)return;var el=$('#lp');if(!el||$('#lock').style.display==='none')return;try{el.focus({preventScroll:true})}catch(e){el.focus()}}
+function lockIt(){
+ if(!P.pin)return;
+ $('#lp').value='';
+ $('#le').textContent='';
+ $('#lock').style.display='flex';
+ if(!document.hidden)setTimeout(focusPin,250);
+}
+function checkPin(showError){var v=$('#lp').value;if(v.length>=4&&hh(v+'dv')===P.pin){$('#lock').style.display='none';$('#le').textContent='';return true}if(showError&&v.length>=4)$('#le').textContent=t('wrong');return false}
+ $('#lp').oninput=function(){checkPin(false)};
+ 
+document.addEventListener('visibilitychange',function(){if(document.hidden){if(P.lockEnabled&&P.pin){$('#lock').style.display='flex';$('#lp').value='';$('#le').textContent=''}}else if(P.lockEnabled&&P.pin&&$('#lock').style.display!=='none'){setTimeout(lockIt,300)}});
+function nativeShareExport(name,dataUri){
+ var n=window.DividasNative,FS=n&&n.Filesystem,SH=n&&n.Share;
+ if(!FS||!SH||!n.Directory)return Promise.reject(new Error('Partilha nativa indisponível'));
+ var comma=dataUri.indexOf(','),base64=comma>=0?dataUri.slice(comma+1):dataUri;
+ return FS.writeFile({path:name,data:base64,directory:n.Directory.Cache,recursive:true})
+  .then(function(file){return SH.share({title:name,text:'Ficheiro exportado pela aplicação Dívidas.',url:file.uri,dialogTitle:'Exportar ficheiro'})});
+}
+$('#exp').onclick=function(){
+ var name='dividas-copia-'+today()+'.json',json=JSON.stringify(S,null,2);
+ if(window.DividasNative&&window.DividasNative.Filesystem&&window.DividasNative.Share){
+  nativeShareExport(name,'data:application/json;base64,'+btoa(unescape(encodeURIComponent(json))))
+   .catch(function(e){console.warn('Exportação JSON:',e);alert('Não foi possível partilhar o ficheiro. '+(e&&e.message?e.message:''))});
+ }else dl(name,'application/json',json);
+};
+$('#expPdf').onclick=function(){
+ var n=window.DividasNative,J=n&&n.jsPDF;
+ if(!J){alert('A exportação PDF não está disponível nesta versão.');return}
+ try{
+  var doc=new J({orientation:'portrait',unit:'mm',format:'a4'}),y=18;
+  doc.setProperties({title:'Relatório de dívidas',subject:'Registos e pagamentos'});
+  function line(value,bold,size){
+   doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(size||10);
+   var rows=doc.splitTextToSize(String(value),182);
+   if(y+rows.length*5.5>282){doc.addPage();y=18}
+   doc.text(rows,14,y);y+=rows.length*5.5+2;
+  }
+  doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('Relatório de dívidas',14,y);y+=9;
+  line('Data: '+dt(today()),false,9);
+  var owed=0,owe=0;S.forEach(function(d){if(d.kind==='devo')owe+=bal(d);else owed+=bal(d)});
+  line('Eu devo: '+fmt(owe)+'     Devem-me: '+fmt(owed),true,10);
+  line('Saldo líquido: '+fmt(owed-owe),true,10);y+=3;
+  if(!S.length)line('Nenhum registo de dívida.',false,10);
+  S.forEach(function(d){
+   line((d.kind==='devo'?t('iow'):t('he'))+' — '+d.person,true,11);
+   line('Valor: '+fmt(d.total)+' | Pago: '+fmt(paid(d))+' | Em falta: '+fmt(bal(d)),false,9);
+   line('Data: '+dt(d.date)+(d.due?' | Limite: '+dt(d.due):''),false,9);
+   if(d.note)line('Nota: '+d.note,false,9);
+   (d.pays||[]).forEach(function(x){line('Pagamento: '+dt(x.d)+' — '+fmt(x.a),false,9)});
+   (d.additions||[]).forEach(function(x){line('Dívida adicionada: '+dt(x.d)+' — '+fmt(x.a)+(x.note?' | '+x.note:''),false,9)});
+   y+=2;
+  });
+  var name='relatorio-dividas-'+today()+'.pdf';
+  if(n&&n.Filesystem&&n.Share){
+   nativeShareExport(name,doc.output('datauristring')).catch(function(e){console.warn('Exportação PDF:',e);alert('Não foi possível partilhar o PDF. '+(e&&e.message?e.message:''))});
+  }else doc.save(name);
+ }catch(e){console.error(e);alert('Não foi possível gerar o PDF.')}
+};
+$('#imp').onclick=function(){$('#fi').click()};
+$('#fi').onchange=function(e){var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(){try{var A=JSON.parse(r.result);if(!Array.isArray(A))throw 0;var ids={};S.forEach(function(x){ids[x.id]=1});var n=0;A.forEach(function(x){if(x&&x.id&&x.person&&x.total>0&&Array.isArray(x.pays)&&!ids[x.id]){S.push(x);n++}});sv();render();alert(t('impd',{n:n}))}catch(err){alert(t('inv'))}e.target.value=''};r.readAsText(f)};
+$('#wipe').onclick=function(){if(confirm(t('cwipe'))){S=[];TRASH=[];sv();trashSv();render();fillSet()}};
+/* updates */
+function compareVersions(a,b){var aa=String(a||'').replace(/^v/,'').split('.').map(Number),bb=String(b||'').replace(/^v/,'').split('.').map(Number);for(var i=0;i<Math.max(aa.length,bb.length);i++){var d=(aa[i]||0)-(bb[i]||0);if(d)return d>0?1:-1}return 0}
+var chkd=false,updateCheckPromise=null;
+function normalizeReleaseVersion(tag){
+ var raw=String(tag||'').replace(/^v/i,'').replace(/n$/i,'');
+ var legacy=raw.match(/^1\.(\d{3})$/);
+ if(legacy){var d=legacy[1];return '1.'+Number(d[0])+'.'+Number(d[1])+'.'+Number(d[2])}
+ return raw;
+}
+function uiUpd(){
+ $('#gear').classList.toggle('dot',upd);
+ $('#doUpd').style.display=upd?'':'none';
+ $('#uT').textContent=!chkd?'':(upd?t('upd')+' (v'+NV+')':t('ok'));var nb=$('#toggleReleaseNotes'),np=$('#releaseNotes');if(nb&&np){var has=!!(upd&&NVNotes&&NVNotes.trim());nb.style.display=has?'':'none';if(!has){nb.textContent=t('showNotes');nb.setAttribute('aria-expanded','false');np.classList.remove('on');np.textContent=''}else if(!np.classList.contains('on'))nb.textContent=t('showNotes')}
+}
+function chk(){
+ var b=$('#chk');
+ if(updateCheckPromise)return updateCheckPromise;
+ if(b){b.disabled=true;b.classList.add('loading')}
+ updateCheckPromise=fetch('https://api.github.com/repos/Michaque31/Playoff--Releases/releases/latest',{headers:{Accept:'application/vnd.github+json'},cache:'no-store'})
+  .then(function(r){if(!r.ok)throw new Error('GitHub HTTP '+r.status);return r.json()})
+  .then(function(rel){
+   if(!rel||rel.draft||rel.prerelease||!rel.tag_name)throw new Error('Release estável não encontrada');
+   var version=normalizeReleaseVersion(rel.tag_name);
+   if(!/^\d+(?:\.\d+){2,3}$/.test(version))throw new Error('Versão publicada inválida: '+version);
+   NV=version;var releaseBody=String(rel.body||'').trim();var meaningfulNotes=releaseBody.replace(/\*\*?Full Changelog\*\*?:?\s*https?:\/\/\S+/ig,'').replace(/https?:\/\/\S+/g,'').replace(/[\s*#>-]/g,'').trim();NVNotes=meaningfulNotes?releaseBody.replace(/\*\*?Full Changelog\*\*?:?\s*https?:\/\/\S+/ig,'').trim():t('releaseSummary');if(!NVNotes)NVNotes=t('releaseSummary');chkd=true;upd=compareVersions(NV,V)>0;uiUpd();
+   try{localStorage.setItem('dv_release_check_cache',JSON.stringify({version:NV,checkedAt:Date.now(),tag:rel.tag_name}))}catch(e){}
+   try{localStorage.removeItem('dv_update_available_version')}catch(e){}
+  })
+  .catch(function(err){
+   console.warn('Verificação de atualizações Payoff:',err);
+   var cached=null;
+   try{cached=JSON.parse(localStorage.getItem('dv_release_check_cache')||'null')}catch(e){}
+   if(cached&&cached.version&&cached.checkedAt&&Date.now()-cached.checkedAt<24*60*60*1000){
+    NV=normalizeReleaseVersion(cached.version);chkd=true;upd=compareVersions(NV,V)>0;uiUpd();
+   }else{
+    NV='';upd=false;chkd=false;uiUpd();
+    try{localStorage.removeItem('dv_release_check_cache');localStorage.removeItem('dv_update_available_version')}catch(e){}
+    if($('#uT'))$('#uT').textContent=t('off');
+   }
+  })
+  .then(function(){if(b){b.disabled=false;b.classList.remove('loading')}updateCheckPromise=null});
+ return updateCheckPromise;
+}
+$('#toggleReleaseNotes').onclick=function(){var p=$('#releaseNotes'),b=$('#toggleReleaseNotes'),on=!p.classList.contains('on');p.textContent=NVNotes||'';p.classList.toggle('on',on);b.setAttribute('aria-expanded',on?'true':'false');b.textContent=t(on?'hideNotes':'showNotes')};$('#chk').onclick=chk;
+$('#doUpd').onclick=function(){if(window.DividasStartUpdateDownload)window.DividasStartUpdateDownload()};
+/* device notification on open */
+function ntf(){
+ if(!P.rem||!window.Notification||Notification.permission!=='granted'||P.ln===today())return;
+ var n=due().length;if(!n)return;P.ln=today();sp();
+ var o={body:t('remB',{n:n}),icon:'icon-192.png'};
+ if(navigator.serviceWorker&&navigator.serviceWorker.ready)navigator.serviceWorker.ready.then(function(r){r.showNotification(t('title'),o)}).catch(function(){});
+}
+applyTheme();applyI();render();lockIt();ntf();chk();
+window.addEventListener('online',function(){chk()});
+document.addEventListener('visibilitychange',function(){if(!document.hidden){chk();if(window.DividasResumeUpdate)window.DividasResumeUpdate()}});
+if(window.DividasNative&&window.DividasNative.App){
+ var appPlugin=window.DividasNative.App;
+ appPlugin.addListener('backButton',function(event){
+  var modals=document.querySelectorAll('.ov.on'),modal=modals.length?modals[modals.length-1]:null;
+  if(modal){show('#'+modal.id,false);return}
+  if($('#lock').style.display!=='none')return;
+  if(event&&event.canGoBack){window.history.back();return}
+  appPlugin.exitApp();
+ }).catch(function(e){console.warn('Gestos de voltar:',e)});
+ appPlugin.addListener('appStateChange',function(state){if(state&&state.isActive){chk();if(window.DividasResumeUpdate)window.DividasResumeUpdate()}}).catch(function(){});
+}
+setInterval(function(){if(!document.hidden)chk()},15*60*1000);
+
+function hidePayoffBootSplash(){
+ var splash=document.getElementById('payoffBootSplash');
+ if(!splash)return;
+ function hideWebSplash(){
+  var elapsed=Date.now()-(window.__payoffBootStartedAt||Date.now());
+  window.setTimeout(function(){splash.classList.add('done');window.setTimeout(function(){if(splash.parentNode)splash.parentNode.removeChild(splash)},320)},Math.max(0,480-elapsed));
+ }
+ function waitForFirstWebFrames(){if(window.requestAnimationFrame)window.requestAnimationFrame(function(){window.requestAnimationFrame(hideWebSplash)});else window.setTimeout(hideWebSplash,80)}
+ var nativeSplash=window.DividasNative&&window.DividasNative.SplashScreen;
+ if(nativeSplash&&nativeSplash.hide)Promise.resolve(nativeSplash.hide()).then(waitForFirstWebFrames).catch(function(e){console.warn('Transição da abertura nativa:',e);waitForFirstWebFrames()});
+ else waitForFirstWebFrames();
+}
+hidePayoffBootSplash();
+
+if('serviceWorker' in navigator&&!(window.Capacitor&&window.Capacitor.isNativePlatform&&window.Capacitor.isNativePlatform()))navigator.serviceWorker.register('sw.js').catch(function(){});
+</script>
+<script src="xitique.js"></script>
+</body>
+</html>
