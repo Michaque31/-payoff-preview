@@ -1,5 +1,5 @@
-const CACHE='payoff-preview-v2';
-const FILES=['./','./index.html','./manifest.json','./payoff-symbol.svg','./version.json'];
+const CACHE='payoff-preview-v3';
+const FILES=['./','./index.html','./manifest.json','./payoff-symbol.svg','./payoff-evolution.js','./version.json'];
 self.addEventListener('install',e=>e.waitUntil(
   caches.open(CACHE)
     .then(c=>Promise.all(FILES.map(u=>fetch(u,{cache:'reload'}).then(r=>{if(!r.ok)throw new Error('Falha ao atualizar '+u);return c.put(u,r)}))))
