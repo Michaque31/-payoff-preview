@@ -1,0 +1,18 @@
+{
+  "name": "Payoff — Prévia",
+  "short_name": "Payoff",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f5f1",
+  "theme_color": "#1d6b57",
+  "lang": "pt",
+  "icons": [
+    {
+      "src": "payoff-symbol.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
