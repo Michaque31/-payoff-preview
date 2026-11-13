@@ -30,7 +30,7 @@ function open(title,html){$('#peTitle').textContent=title;$('#peBody').innerHTML
 function close(){ $('#peModal').classList.remove('open') }
 function drawPromises(){
  var active=promises.filter(function(p){return p.status!=='done'&&p.status!=='cancelled'}).sort(function(a,b){return a.date.localeCompare(b.date)}),box=$('#peProm');
- box.style.display=active.length?'block':'none';$('#pePromiseRows').innerHTML=active.slice(0,5).map(function(p){return'<div class="pe-row" style="padding:9px 0;border-top:1px solid var(--bd)"><span><b>'+esc(p.person)+'</b><small class="pe-muted">'+dt(p.date)+(p.note?' · '+esc(p.note):'')+'</small></span><span style="text-align:right"><b>'+money(p.amount)+'</b><small class="pe-muted">'+(p.date<day()?'Em atraso':'Prometido')+'</small></span></div>'}).join('');
+ box.style.display='block';$('#pePromiseRows').innerHTML=active.length?active.slice(0,5).map(function(p){return'<div class="pe-row" style="padding:9px 0;border-top:1px solid var(--bd)"><span><b>'+esc(p.person)+'</b><small class="pe-muted">'+dt(p.date)+(p.note?' · '+esc(p.note):'')+'</small></span><span style="text-align:right"><b>'+money(p.amount)+'</b><small class="pe-muted">'+(p.date<day()?'Em atraso':'Prometido')+'</small></span></div>'}).join(''):'<div class="pe-empty">Ainda não tens promessas registadas. Usa “Nova” para adicionar uma.</div>';
 }
 function people(){
  var q=($('#pePeopleSearch').value||'').toLowerCase(),m={};
